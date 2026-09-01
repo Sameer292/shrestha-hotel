@@ -1,26 +1,117 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--cream: #faf7f2;
+	--cream-2: #f5f0e8;
+	--stone: #e8e0d5;
+	--sand: #d6c7b8;
+	--forest: #1b2f23;
+	--forest-2: #243a2e;
+	--moss: #4a6741;
+	--sage: #a8b5a0;
+	--charcoal: #1a1a18;
+	--ink: #2c2c2a;
+	--muted: #6b6b63;
+	--line: #e8e0d5;
+	--accent: #c9a86a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	--color-cream: var(--cream);
+	--color-cream-2: var(--cream-2);
+	--color-stone: var(--stone);
+	--color-sand: var(--sand);
+	--color-forest: var(--forest);
+	--color-forest-2: var(--forest-2);
+	--color-moss: var(--moss);
+	--color-sage: var(--sage);
+	--color-charcoal: var(--charcoal);
+	--color-ink: var(--ink);
+	--color-muted: var(--muted);
+	--color-line: var(--line);
+	--color-accent: var(--accent);
+	--font-display: var(--font-display);
+	--font-body: var(--font-body);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--stone) transparent;
+}
+html {
+	scroll-behavior: auto;
+}
+html.lenis,
+html.lenis body {
+	height: auto;
+}
+.lenis.lenis-smooth {
+	scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+	overflow: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--cream);
+	color: var(--ink);
+	font-family: var(--font-body), system-ui, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+::selection {
+	background: var(--forest);
+	color: var(--cream);
+}
+
+/* Typography scale - editorial */
+.display {
+	font-family: var(--font-display), Georgia, serif;
+	font-weight: 400;
+	letter-spacing: -0.02em;
+	line-height: 0.95;
+}
+.eyebrow {
+	font-size: 0.7rem;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	font-weight: 500;
+}
+
+/* Utilities */
+.container-outer {
+	width: min(1440px, 100% - 2rem);
+	margin-inline: auto;
+}
+@media (min-width: 768px) {
+	.container-outer {
+		width: min(1440px, 100% - 3rem);
+	}
+}
+@media (min-width: 1280px) {
+	.container-outer {
+		width: min(1440px, 100% - 4rem);
+	}
+}
+
+/* Image reveal clip */
+.reveal-clip {
+	clip-path: inset(0 0 0 0);
+}
+
+/* Focus */
+:focus-visible {
+	outline: 2px solid var(--forest);
+	outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
 }

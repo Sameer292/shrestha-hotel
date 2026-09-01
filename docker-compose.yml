@@ -1,0 +1,55 @@
+services:
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: shrestha_cms
+      MYSQL_USER: shrestha
+      MYSQL_PASSWORD: shrestha_pass
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wordpress:
+    image: wordpress:6.8-php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: shrestha
+      WORDPRESS_DB_PASSWORD: shrestha_pass
+      WORDPRESS_DB_NAME: shrestha_cms
+      WORDPRESS_DEBUG: "1"
+    volumes:
+      - wp_data:/var/www/html
+
+  # one-shot WP-CLI helper — run `docker compose run --rm wpcli <cmd>`
+  wpcli:
+    image: wordpress:cli-php8.3
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    volumes:
+      - wp_data:/var/www/html
+    entrypoint: wp
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: shrestha
+      WORDPRESS_DB_PASSWORD: shrestha_pass
+      WORDPRESS_DB_NAME: shrestha_cms
+    command: --info
+
+volumes:
+  db_data:
+  wp_data:
