@@ -290,7 +290,7 @@ echo "\n==> Creating Gallery Items...\n";
 $gallery = [
     [
         'title' => 'Timber and stone lobby at dusk',
-        'image' => 'https://images.unsplash.com/photo-1445019980597-93fa8ac97c40?auto=format&fit=crop&w=800&h=1000&q=80',
+        'image' => 'https://images.unsplash.com/photo-1518002054494-3a6f94352e9d?auto=format&fit=crop&w=800&h=1000&q=80',
         'acf' => ['category' => 'Hotel', 'caption' => 'Timber and stone lobby at dusk', 'displayOrder' => 1],
     ],
     [

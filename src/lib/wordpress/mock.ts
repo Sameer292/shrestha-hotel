@@ -28,7 +28,7 @@ const curated = {
 	exp4: "https://images.unsplash.com/photo-1501785888041-af3ef285b470", // riverside
 	exp5: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4", // bonfire
 	exp6: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b", // viewpoint
-	galleryHotel: "https://images.unsplash.com/photo-1445019980597-93fa8ac97c40",
+	galleryHotel: "https://images.unsplash.com/photo-1518002054494-3a6f94352e9d",
 	gallerySpring: "https://images.unsplash.com/photo-1571896349842-33c89424de2d",
 	galleryRoom: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
 	galleryNature: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
