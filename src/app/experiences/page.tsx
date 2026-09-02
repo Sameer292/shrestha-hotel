@@ -3,7 +3,7 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { getExperiences } from "@/lib/wordpress/queries";
 
-export const revalidate = 60;
+export const revalidate = 10;
 export const metadata = { title: "Experiences — Mountains, Villages & Rivers" };
 
 export default async function ExperiencesPage() {

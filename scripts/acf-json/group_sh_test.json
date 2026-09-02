@@ -1,0 +1,19 @@
+{
+  "key": "group_sh_test",
+  "title": "Testimonial Fields",
+  "fields": [
+    {"key": "field_sh_test_name", "name": "guestName", "label": "Guest Name", "type": "text"},
+    {"key": "field_sh_test_loc", "name": "guestLocation", "label": "Guest Location", "type": "text"},
+    {"key": "field_sh_test_quote", "name": "quote", "label": "Quote", "type": "textarea", "rows": 4},
+    {"key": "field_sh_test_rating", "name": "rating", "label": "Rating (1-5)", "type": "number", "min": 1, "max": 5},
+    {"key": "field_sh_test_featured", "name": "featured", "label": "Featured", "type": "true_false", "default_value": 0}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "testimonial"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "default",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "testimonialFields"
+}

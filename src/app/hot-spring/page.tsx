@@ -3,7 +3,7 @@ import Link from "next/link";
 import { mockHome } from "@/lib/wordpress/mock";
 import { getFaqs } from "@/lib/wordpress/queries";
 
-export const revalidate = 60;
+export const revalidate = 10;
 export const metadata = { title: "Hot Spring — Natural Mineral Baths" };
 
 export default async function HotSpringPage() {
