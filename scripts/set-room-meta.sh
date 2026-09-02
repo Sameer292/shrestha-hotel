@@ -1,73 +1,84 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# set-room-meta.sh — Sets ACF meta values for all rooms
+# set-room-meta.sh — Sets ACF meta values for all rooms (ID-agnostic, looks up by slug)
+
+get_id() {
+  local type="$1" slug="$2"
+  docker compose run --rm wpcli --path=/var/www/html post list --post_type="$type" --format=json 2>/dev/null \
+    | python3 -c "import json,sys; data=json.load(sys.stdin); print(next((str(x['ID']) for x in data if x.get('post_name')==sys.argv[1]), ''))" "$slug"
+}
 
 WP="docker compose run --rm wpcli --path=/var/www/html"
-
 echo "==> Setting room meta values..."
 
-# Forest Retreat Suite (ID 38)
-$WP post meta update 38 startingPrice 18500
-$WP post meta update 38 capacity 2
-$WP post meta update 38 adults 2
-$WP post meta update 38 children 1
-$WP post meta update 38 bedType "King Bed"
-$WP post meta update 38 roomSize "38 m²"
-$WP post meta update 38 view "Forest & Valley View"
-$WP post meta update 38 amenities "Mountain View, Hot Spring Access, Private Bathroom, Heating, Balcony, Wi-Fi, Garden View"
-$WP post meta update 38 checkIn "2:00 PM"
-$WP post meta update 38 checkOut "11:00 AM"
-$WP post meta update 38 featured 1
-$WP post meta update 38 displayOrder 1
-echo "  ✓ Forest Retreat Suite"
+ID=$(get_id room forest-retreat-suite)
+if [ -n "$ID" ]; then
+  $WP post meta update "$ID" startingPrice 18500 >/dev/null
+  $WP post meta update "$ID" capacity 2 >/dev/null
+  $WP post meta update "$ID" adults 2 >/dev/null
+  $WP post meta update "$ID" children 1 >/dev/null
+  $WP post meta update "$ID" bedType "King Bed" >/dev/null
+  $WP post meta update "$ID" roomSize "38 m²" >/dev/null
+  $WP post meta update "$ID" view "Forest & Valley View" >/dev/null
+  $WP post meta update "$ID" amenities "Mountain View, Hot Spring Access, Private Bathroom, Heating, Balcony, Wi-Fi, Garden View" >/dev/null
+  $WP post meta update "$ID" checkIn "2:00 PM" >/dev/null
+  $WP post meta update "$ID" checkOut "11:00 AM" >/dev/null
+  $WP post meta update "$ID" featured 1 >/dev/null
+  $WP post meta update "$ID" displayOrder 1 >/dev/null
+  echo "  ✓ Forest Retreat Suite (ID $ID)"
+else echo "  ✗ forest-retreat-suite not found"; fi
 
-# Hotspring Deluxe (ID 39)
-$WP post meta update 39 startingPrice 14500
-$WP post meta update 39 capacity 2
-$WP post meta update 39 adults 2
-$WP post meta update 39 children 1
-$WP post meta update 39 bedType "Queen Bed"
-$WP post meta update 39 roomSize "28 m²"
-$WP post meta update 39 view "Garden & Spring View"
-$WP post meta update 39 amenities "Hot Spring Access, Mountain View, Private Bathroom, Heating, Wi-Fi, Room Service"
-$WP post meta update 39 checkIn "2:00 PM"
-$WP post meta update 39 checkOut "11:00 AM"
-$WP post meta update 39 featured 1
-$WP post meta update 39 displayOrder 2
-echo "  ✓ Hotspring Deluxe"
+ID=$(get_id room hotspring-deluxe)
+if [ -n "$ID" ]; then
+  $WP post meta update "$ID" startingPrice 14500 >/dev/null
+  $WP post meta update "$ID" capacity 2 >/dev/null
+  $WP post meta update "$ID" adults 2 >/dev/null
+  $WP post meta update "$ID" children 1 >/dev/null
+  $WP post meta update "$ID" bedType "Queen Bed" >/dev/null
+  $WP post meta update "$ID" roomSize "28 m²" >/dev/null
+  $WP post meta update "$ID" view "Garden & Spring View" >/dev/null
+  $WP post meta update "$ID" amenities "Hot Spring Access, Mountain View, Private Bathroom, Heating, Wi-Fi, Room Service" >/dev/null
+  $WP post meta update "$ID" checkIn "2:00 PM" >/dev/null
+  $WP post meta update "$ID" checkOut "11:00 AM" >/dev/null
+  $WP post meta update "$ID" featured 1 >/dev/null
+  $WP post meta update "$ID" displayOrder 2 >/dev/null
+  echo "  ✓ Hotspring Deluxe (ID $ID)"
+else echo "  ✗ hotspring-deluxe not found"; fi
 
-# Mountain Family Retreat (ID 40)
-$WP post meta update 40 startingPrice 22000
-$WP post meta update 40 capacity 4
-$WP post meta update 40 adults 3
-$WP post meta update 40 children 2
-$WP post meta update 40 bedType "King + Bunk"
-$WP post meta update 40 roomSize "45 m²"
-$WP post meta update 40 view "Mountain Panorama"
-$WP post meta update 40 amenities "Family Rooms, Mountain View, Hot Spring Access, Heating, Balcony, Wi-Fi"
-$WP post meta update 40 checkIn "2:00 PM"
-$WP post meta update 40 checkOut "11:00 AM"
-$WP post meta update 40 featured 1
-$WP post meta update 40 displayOrder 3
-echo "  ✓ Mountain Family Retreat"
+ID=$(get_id room mountain-family-retreat)
+if [ -n "$ID" ]; then
+  $WP post meta update "$ID" startingPrice 22000 >/dev/null
+  $WP post meta update "$ID" capacity 4 >/dev/null
+  $WP post meta update "$ID" adults 3 >/dev/null
+  $WP post meta update "$ID" children 2 >/dev/null
+  $WP post meta update "$ID" bedType "King + Bunk" >/dev/null
+  $WP post meta update "$ID" roomSize "45 m²" >/dev/null
+  $WP post meta update "$ID" view "Mountain Panorama" >/dev/null
+  $WP post meta update "$ID" amenities "Family Rooms, Mountain View, Hot Spring Access, Heating, Balcony, Wi-Fi" >/dev/null
+  $WP post meta update "$ID" checkIn "2:00 PM" >/dev/null
+  $WP post meta update "$ID" checkOut "11:00 AM" >/dev/null
+  $WP post meta update "$ID" featured 1 >/dev/null
+  $WP post meta update "$ID" displayOrder 3 >/dev/null
+  echo "  ✓ Mountain Family Retreat (ID $ID)"
+else echo "  ✗ mountain-family-retreat not found"; fi
 
-# Riverside Calm (ID 41)
-$WP post meta update 41 startingPrice 11500
-$WP post meta update 41 capacity 2
-$WP post meta update 41 adults 2
-$WP post meta update 41 children 0
-$WP post meta update 41 bedType "Queen Bed"
-$WP post meta update 41 roomSize "24 m²"
-$WP post meta update 41 view "River & Forest"
-$WP post meta update 41 amenities "Hot Spring Access, Private Bathroom, Wi-Fi, Heating"
-$WP post meta update 41 checkIn "2:00 PM"
-$WP post meta update 41 checkOut "11:00 AM"
-$WP post meta update 41 featured 0
-$WP post meta update 41 displayOrder 4
-echo "  ✓ Riverside Calm"
+ID=$(get_id room riverside-calm)
+if [ -n "$ID" ]; then
+  $WP post meta update "$ID" startingPrice 11500 >/dev/null
+  $WP post meta update "$ID" capacity 2 >/dev/null
+  $WP post meta update "$ID" adults 2 >/dev/null
+  $WP post meta update "$ID" children 0 >/dev/null
+  $WP post meta update "$ID" bedType "Queen Bed" >/dev/null
+  $WP post meta update "$ID" roomSize "24 m²" >/dev/null
+  $WP post meta update "$ID" view "River & Forest" >/dev/null
+  $WP post meta update "$ID" amenities "Hot Spring Access, Private Bathroom, Wi-Fi, Heating" >/dev/null
+  $WP post meta update "$ID" checkIn "2:00 PM" >/dev/null
+  $WP post meta update "$ID" checkOut "11:00 AM" >/dev/null
+  $WP post meta update "$ID" featured 0 >/dev/null
+  $WP post meta update "$ID" displayOrder 4 >/dev/null
+  echo "  ✓ Riverside Calm (ID $ID)"
+else echo "  ✗ riverside-calm not found"; fi
 
 echo ""
 echo "==> Testing GraphQL..."
-curl -s -X POST http://localhost:8080/graphql \
-  -H 'Content-Type: application/json' \
-  -d '{"query": "{ rooms { nodes { title roomFields { startingprice bedtype roomsize view } } } }"}' | python3 -m json.tool
+curl -s -X POST http://localhost:8080/graphql -H 'Content-Type: application/json' -d '{"query": "{ rooms { nodes { title roomFields { startingprice bedtype roomsize view } } } }"}' | python3 -m json.tool
