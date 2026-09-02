@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { getExperienceBySlug, getExperiences } from "@/lib/wordpress/queries";
 
-export const revalidate = 60;
+export const revalidate = 10;
 export async function generateStaticParams() {
 	const ex = await getExperiences();
 	return ex.map((e) => ({ slug: e.slug }));

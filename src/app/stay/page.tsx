@@ -6,7 +6,7 @@ import { formatPrice } from "@/lib/utils";
 import { getRooms } from "@/lib/wordpress/queries";
 
 export const metadata: Metadata = { title: "Stay — Rooms & Suites" };
-export const revalidate = 60;
+export const revalidate = 10;
 
 export default async function StayPage() {
 	const rooms = await getRooms();

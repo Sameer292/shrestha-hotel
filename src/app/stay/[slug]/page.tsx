@@ -5,7 +5,7 @@ import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { formatPrice } from "@/lib/utils";
 import { getRoomBySlug, getRooms } from "@/lib/wordpress/queries";
 
-export const revalidate = 60;
+export const revalidate = 10;
 export async function generateStaticParams() {
 	const rooms = await getRooms();
 	return rooms.map((r) => ({ slug: r.slug }));

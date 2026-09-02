@@ -17,7 +17,7 @@ import {
 	getTestimonials,
 } from "@/lib/wordpress/queries";
 
-export const revalidate = 60;
+export const revalidate = 10;
 
 export default async function Home() {
 	const [home, rooms, experiences, testimonials, gallery, settings] =

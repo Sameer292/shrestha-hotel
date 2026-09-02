@@ -1,0 +1,17 @@
+{
+  "key": "group_sh_gallery",
+  "title": "Gallery Item Fields",
+  "fields": [
+    {"key": "field_sh_gallery_cat", "name": "category", "label": "Category", "type": "select", "choices": {"Hotel": "Hotel", "Rooms": "Rooms", "Hot Spring": "Hot Spring", "Nature": "Nature", "Dining": "Dining", "Experiences": "Experiences"}},
+    {"key": "field_sh_gallery_cap", "name": "caption", "label": "Caption", "type": "text"},
+    {"key": "field_sh_gallery_order", "name": "displayOrder", "label": "Display Order", "type": "number"}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "gallery_item"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "default",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "galleryItemFields"
+}

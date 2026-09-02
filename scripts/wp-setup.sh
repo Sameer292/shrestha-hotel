@@ -29,6 +29,15 @@ docker compose run --rm --user 33:33 wpcli --path=/var/www/html plugin install h
 docker compose run --rm --user 33:33 wpcli --path=/var/www/html plugin is-installed advanced-custom-fields || \
   docker compose run --rm --user 33:33 wpcli --path=/var/www/html plugin install advanced-custom-fields --activate || true
 
+echo "==> Installing mu-plugins (CPTs + ACF loader)..."
+docker compose exec wordpress mkdir -p /var/www/html/wp-content/mu-plugins
+docker compose cp scripts/mu-plugins/. wordpress:/var/www/html/wp-content/mu-plugins/
+docker compose exec wordpress mkdir -p /var/www/html/wp-content/themes/twentytwentyfive/acf-json
+docker compose cp scripts/acf-json/. wordpress:/var/www/html/wp-content/themes/twentytwentyfive/acf-json/
+docker compose restart wordpress
+echo "  waiting for WP to come back..."
+until curl -sf "$WP_URL/wp-admin/install.php" >/dev/null 2>&1 || curl -sf "$WP_URL/wp-login.php" >/dev/null 2>&1; do sleep 2; done
+
 echo "==> Permalinks → postname, rewrite flush..."
 docker compose run --rm --user 33:33 wpcli --path=/var/www/html rewrite structure '/%postname%/' --hard || true
 docker compose run --rm --user 33:33 wpcli --path=/var/www/html rewrite flush --hard || true

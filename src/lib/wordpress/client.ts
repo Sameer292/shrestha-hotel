@@ -18,7 +18,7 @@ export async function wpFetch<T>(
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ query, variables }),
-			next: { revalidate: 60 },
+			next: { revalidate: 10 },
 		});
 		if (!res.ok) return null;
 		const json = await res.json();

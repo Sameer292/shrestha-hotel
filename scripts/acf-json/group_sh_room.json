@@ -1,0 +1,29 @@
+{
+  "key": "group_sh_room",
+  "title": "Room Fields",
+  "fields": [
+    {"key": "field_sh_room_price", "name": "startingPrice", "label": "Starting Price", "type": "number"},
+    {"key": "field_sh_room_currency", "name": "currency", "label": "Currency", "type": "select", "choices": {"NPR": "NPR", "USD": "USD"}, "default_value": "NPR"},
+    {"key": "field_sh_room_capacity", "name": "capacity", "label": "Capacity (guests)", "type": "number"},
+    {"key": "field_sh_room_adults", "name": "adults", "label": "Adults", "type": "number"},
+    {"key": "field_sh_room_children", "name": "children", "label": "Children", "type": "number"},
+    {"key": "field_sh_room_bed", "name": "bedType", "label": "Bed Type", "type": "text"},
+    {"key": "field_sh_room_size", "name": "roomSize", "label": "Room Size", "type": "text"},
+    {"key": "field_sh_room_view", "name": "view", "label": "View", "type": "text"},
+    {"key": "field_sh_room_amenities", "name": "amenities", "label": "Amenities", "type": "text"},
+    {"key": "field_sh_room_checkin", "name": "checkIn", "label": "Check-in Time", "type": "text"},
+    {"key": "field_sh_room_checkout", "name": "checkOut", "label": "Check-out Time", "type": "text"},
+    {"key": "field_sh_room_featured", "name": "featured", "label": "Featured", "type": "true_false", "default_value": 0},
+    {"key": "field_sh_room_order", "name": "displayOrder", "label": "Display Order", "type": "number"}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "room"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "default",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "roomFields"
+}

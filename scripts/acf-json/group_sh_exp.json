@@ -1,0 +1,21 @@
+{
+  "key": "group_sh_exp",
+  "title": "Experience Fields",
+  "fields": [
+    {"key": "field_sh_exp_duration", "name": "duration", "label": "Duration", "type": "text"},
+    {"key": "field_sh_exp_difficulty", "name": "difficulty", "label": "Difficulty", "type": "text"},
+    {"key": "field_sh_exp_season", "name": "season", "label": "Season", "type": "text"},
+    {"key": "field_sh_exp_price", "name": "optionalPrice", "label": "Optional Price", "type": "number"},
+    {"key": "field_sh_exp_featured", "name": "featured", "label": "Featured", "type": "true_false", "default_value": 0}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "experience"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "default",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "experienceFields"
+}

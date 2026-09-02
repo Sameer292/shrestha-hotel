@@ -18,7 +18,6 @@ import type {
 	Testimonial,
 } from "./types";
 
-// Each getter tries WP then falls back to mock in dev (never silently in prod — logs)
 const isProd = process.env.NODE_ENV === "production";
 
 async function withFallback<T>(
@@ -27,36 +26,76 @@ async function withFallback<T>(
 	label: string,
 ): Promise<T> {
 	if (wpData !== null && wpData !== undefined) {
-		// also treat empty arrays as "no content yet" → use mock but without spamming
 		if (Array.isArray(wpData) && wpData.length === 0) {
-			if (!isProd) return mock;
 			return mock;
 		}
 		return wpData;
 	}
-	if (!isProd) {
-		// client.ts already warns once per GraphQL error, keep this quiet
-		return mock;
-	}
+	if (!isProd) return mock;
 	console.warn(`[wordpress] ${label} — WP unavailable, serving fallback`);
 	return mock;
 }
 
-// WPGraphQL shape helpers — map WP-native fields to our app types
+// WPGraphQL shape with ACF fields (lowercase via WPGraphQL for ACF)
 type WPRoomNode = {
 	slug: string;
 	title: string;
 	excerpt: string;
 	content: string;
 	featuredImage?: { node?: { sourceUrl: string; altText: string } } | null;
+	roomFields?: {
+		startingprice?: number | null;
+		currency?: string | null;
+		capacity?: number | null;
+		adults?: number | null;
+		children?: number | null;
+		bedtype?: string | null;
+		roomsize?: string | null;
+		view?: string | null;
+		amenities?: string | null;
+		checkin?: string | null;
+		checkout?: string | null;
+		featured?: boolean | null;
+		displayorder?: number | null;
+	} | null;
 };
 type WPExpNode = {
 	slug: string;
 	title: string;
 	excerpt: string;
 	content: string;
+	featuredImage?: { node?: { sourceUrl: string; altText: string } } | null;
+	experienceFields?: {
+		duration?: string | null;
+		difficulty?: string | null;
+		season?: string | null;
+		featured?: boolean | null;
+	} | null;
 };
-type WPTermNode = { title: string; content: string; excerpt: string };
+type WPTermNode = {
+	title: string;
+	content: string;
+	excerpt: string;
+	testimonialFields?: {
+		guestname?: string | null;
+		guestlocation?: string | null;
+		quote?: string | null;
+		rating?: number | null;
+		featured?: boolean | null;
+	} | null;
+	faqFields?: {
+		question?: string | null;
+		answer?: string | null;
+		category?: string | null;
+		displayorder?: number | null;
+	} | null;
+	galleryItemFields?: {
+		category?: string | null;
+		caption?: string | null;
+		displayorder?: number | null;
+	} | null;
+	featuredImage?: { node?: { sourceUrl: string; altText: string } } | null;
+};
 
 const CURATED_FALLBACKS = {
 	room: [
@@ -72,6 +111,7 @@ const CURATED_FALLBACKS = {
 };
 
 function mapRoom(n: WPRoomNode, idx = 0): Room {
+	const f = n.roomFields;
 	return {
 		slug: n.slug,
 		name: n.title,
@@ -87,36 +127,53 @@ function mapRoom(n: WPRoomNode, idx = 0): Room {
 					alt: n.title,
 				},
 		gallery: [],
-		capacity: 2,
-		adults: 2,
-		children: 0,
-		bedType: "—",
-		roomSize: "—",
-		view: "—",
-		amenities: [],
-		featured: true,
-		displayOrder: idx,
+		startingPrice: f?.startingprice ?? undefined,
+		currency: f?.currency ?? "NPR",
+		capacity: f?.capacity ?? 2,
+		adults: f?.adults ?? 2,
+		children: f?.children ?? 0,
+		bedType: f?.bedtype ?? "—",
+		roomSize: f?.roomsize ?? "—",
+		view: f?.view ?? "—",
+		amenities: f?.amenities
+			? f.amenities.split(",").map((a) => a.trim())
+			: [],
+		checkIn: f?.checkin ?? "2:00 PM",
+		checkOut: f?.checkout ?? "11:00 AM",
+		featured: f?.featured ?? true,
+		displayOrder: f?.displayorder ?? idx,
 	};
 }
 
-function mapExperience(n: WPExpNode): Experience {
+function mapExperience(n: WPExpNode, idx = 0): Experience {
+	const f = n.experienceFields;
 	return {
 		slug: n.slug,
 		name: n.title,
 		excerpt: n.excerpt?.replace(/<[^>]*>/g, "").trim() || n.title,
 		description: n.content?.replace(/<[^>]*>/g, "").trim() || "",
-		featuredImage: {
-			url: CURATED_FALLBACKS.experience,
-			alt: n.title,
-		},
+		featuredImage: n.featuredImage?.node
+			? {
+					url: n.featuredImage.node.sourceUrl,
+					alt: n.featuredImage.node.altText || n.title,
+				}
+			: {
+					url: CURATED_FALLBACKS.experience,
+					alt: n.title,
+				},
 		gallery: [],
-		featured: true,
+		duration: f?.duration ?? undefined,
+		difficulty: f?.difficulty ?? undefined,
+		season: f?.season ?? undefined,
+		featured: f?.featured ?? true,
 	};
 }
 
-// Minimal safe queries — only request fields that always exist on WPGraphQL
+// ============================================
+// QUERIES
+// ============================================
+
 export async function getHotelSettings(): Promise<HotelSettings> {
-	// hotelSettings is a dummy null field (mu-plugin) → always fallback to mock until ACF options exposed
 	const data = await wpFetch<{ hotelSettings: HotelSettings | null }>(
 		`query { hotelSettings { hotelName } }`,
 	);
@@ -136,11 +193,21 @@ export async function getHomeContent(): Promise<HomeContent> {
 
 export async function getRooms(): Promise<Room[]> {
 	const data = await wpFetch<{ rooms: { nodes: WPRoomNode[] } }>(
-		`query { rooms { nodes { slug title excerpt content featuredImage { node { sourceUrl altText } } } } }`,
+		`query {
+			rooms {
+				nodes {
+					slug title excerpt content
+					featuredImage { node { sourceUrl altText } }
+					roomFields {
+						startingprice currency capacity adults children
+						bedtype roomsize view amenities
+						checkin checkout featured displayorder
+					}
+				}
+			}
+		}`,
 	);
-	// data === null → WP unreachable → fallback to mock (dev only)
 	if (!data) return withFallback(null, mockRooms, "getRooms");
-	// WP reachable but empty → respect WordPress (no hardcoded rooms)
 	if (!data.rooms?.nodes || data.rooms.nodes.length === 0) return [];
 	return data.rooms.nodes.map((n, i) => mapRoom(n, i));
 }
@@ -149,6 +216,7 @@ export async function getFeaturedRooms(): Promise<Room[]> {
 	const rooms = await getRooms();
 	return rooms.filter((r) => r.featured).slice(0, 4);
 }
+
 export async function getRoomBySlug(slug: string): Promise<Room | null> {
 	const rooms = await getRooms();
 	return rooms.find((r) => r.slug === slug) ?? null;
@@ -156,67 +224,120 @@ export async function getRoomBySlug(slug: string): Promise<Room | null> {
 
 export async function getExperiences(): Promise<Experience[]> {
 	const data = await wpFetch<{ experiences: { nodes: WPExpNode[] } }>(
-		`query { experiences { nodes { slug title excerpt content } } }`,
+		`query {
+			experiences {
+				nodes {
+					slug title excerpt content
+					featuredImage { node { sourceUrl altText } }
+					experienceFields {
+						duration difficulty season featured
+					}
+				}
+			}
+		}`,
 	);
 	if (!data) return withFallback(null, mockExperiences, "getExperiences");
 	if (!data.experiences?.nodes || data.experiences.nodes.length === 0)
 		return [];
-	return data.experiences.nodes.map(mapExperience);
+	return data.experiences.nodes.map((n, i) => mapExperience(n, i));
 }
+
 export async function getExperienceBySlug(
 	slug: string,
 ): Promise<Experience | null> {
 	const ex = await getExperiences();
 	return ex.find((e) => e.slug === slug) ?? null;
 }
+
 export async function getTestimonials(): Promise<Testimonial[]> {
 	const data = await wpFetch<{ testimonials: { nodes: WPTermNode[] } }>(
-		`query { testimonials { nodes { title content excerpt } } }`,
+		`query {
+			testimonials {
+				nodes {
+					title content
+					testimonialFields {
+						guestname guestlocation quote rating featured
+					}
+				}
+			}
+		}`,
 	);
 	if (!data) return withFallback(null, mockTestimonials, "getTestimonials");
 	if (!data.testimonials?.nodes || data.testimonials.nodes.length === 0)
 		return [];
-	return data.testimonials.nodes.map((n) => ({
-		guestName: n.title,
-		guestLocation: "",
-		quote: n.content?.replace(/<[^>]*>/g, "").trim() || n.excerpt || "",
-		featured: true,
-	}));
+	return data.testimonials.nodes.map((n) => {
+		const f = n.testimonialFields;
+		const contentText =
+			n.content?.replace(/<[^>]*>/g, "").trim() || n.excerpt || "";
+		return {
+			guestName: n.title || f?.guestname || "",
+			guestLocation: f?.guestlocation ?? "",
+			quote: contentText || f?.quote || "",
+			rating: f?.rating ?? undefined,
+			featured: f?.featured ?? true,
+		};
+	});
 }
+
 export async function getGallery(): Promise<GalleryItem[]> {
 	const data = await wpFetch<{
-		galleryItems: {
-			nodes: (WPTermNode & {
-				featuredImage?: { node?: { sourceUrl: string; altText: string } };
-			})[];
-		};
+		galleryItems: { nodes: WPTermNode[] };
 	}>(
-		`query { galleryItems { nodes { title featuredImage { node { sourceUrl altText } } } } }`,
+		`query {
+			galleryItems {
+				nodes {
+					title
+					featuredImage { node { sourceUrl altText } }
+					galleryItemFields {
+						category caption displayorder
+					}
+				}
+			}
+		}`,
 	);
 	if (!data) return withFallback(null, mockGallery, "getGallery");
 	if (!data.galleryItems?.nodes || data.galleryItems.nodes.length === 0)
 		return [];
-	return data.galleryItems.nodes.map((n, i) => ({
-		image: n.featuredImage?.node
-			? {
-					url: n.featuredImage.node.sourceUrl,
-					alt: n.featuredImage.node.altText || n.title,
-				}
-			: { url: CURATED_FALLBACKS.gallery, alt: n.title },
-		category: "Hotel",
-		displayOrder: i,
-	}));
+	return data.galleryItems.nodes.map((n, i) => {
+		const f = n.galleryItemFields;
+		return {
+			image: n.featuredImage?.node
+				? {
+						url: n.featuredImage.node.sourceUrl,
+						alt: n.featuredImage.node.altText || n.title,
+					}
+				: { url: CURATED_FALLBACKS.gallery, alt: n.title },
+			category: f?.category ?? "Hotel",
+			caption: f?.caption ?? n.title,
+			displayOrder: f?.displayorder ?? i,
+		};
+	});
 }
+
 export async function getFaqs(): Promise<FAQ[]> {
 	const data = await wpFetch<{ faqs: { nodes: WPTermNode[] } }>(
-		`query { faqs { nodes { title content } } }`,
+		`query {
+			faqs {
+				nodes {
+					title content
+					faqFields {
+						question answer category displayorder
+					}
+				}
+			}
+		}`,
 	);
 	if (!data) return withFallback(null, mockFaqs, "getFaqs");
 	if (!data.faqs?.nodes || data.faqs.nodes.length === 0) return [];
-	return data.faqs.nodes.map((n, i) => ({
-		question: n.title,
-		answer: n.content?.replace(/<[^>]*>/g, "").trim() || "",
-		category: "General",
-		displayOrder: i,
-	}));
+	return data.faqs.nodes.map((n, i) => {
+		const f = n.faqFields;
+		const contentText =
+			n.content?.replace(/<[^>]*>/g, "").trim() || "";
+		return {
+			question: n.title || f?.question || "",
+			answer: contentText || f?.answer || "",
+			category: f?.category ?? "General",
+			displayOrder: f?.displayorder ?? i,
+		};
+	});
 }

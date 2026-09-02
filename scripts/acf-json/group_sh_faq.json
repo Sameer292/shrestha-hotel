@@ -1,0 +1,18 @@
+{
+  "key": "group_sh_faq",
+  "title": "FAQ Fields",
+  "fields": [
+    {"key": "field_sh_faq_question", "name": "question", "label": "Question", "type": "text"},
+    {"key": "field_sh_faq_answer", "name": "answer", "label": "Answer", "type": "textarea", "rows": 4},
+    {"key": "field_sh_faq_cat", "name": "category", "label": "Category", "type": "text"},
+    {"key": "field_sh_faq_order", "name": "displayOrder", "label": "Display Order", "type": "number"}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "faq"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "default",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "faqFields"
+}
