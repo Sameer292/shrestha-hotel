@@ -48,7 +48,7 @@ export default function Header({
 			>
 				<div className="container-outer flex items-center justify-between">
 					<Link href="/" className="flex items-center gap-3">
-						<span className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] tracking-[0.15em] font-medium border bg-[var(--forest)] text-[var(--cream)] border-[var(--forest)]">
+						<span className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] tracking-[0.15em] font-medium border bg-[var(--gold)] text-white border-[var(--gold)]">
 							SH
 						</span>
 						<span className="leading-none text-[var(--forest)]">

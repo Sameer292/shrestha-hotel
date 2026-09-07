@@ -20,17 +20,17 @@ export default function Location({ settings }: { settings: HotelSettings }) {
 					</p>
 					<ul className="mt-6 space-y-3 text-sm">
 						<li className="flex gap-3 items-start">
-							<MapPin size={16} className="mt-0.5 text-[var(--moss)]" />{" "}
+							<MapPin size={16} className="mt-0.5 text-[var(--sage)]" />{" "}
 							<span>{settings.address}</span>
 						</li>
 						<li className="flex gap-3 items-center">
-							<Phone size={16} className="text-[var(--moss)]" />{" "}
+							<Phone size={16} className="text-[var(--sage)]" />{" "}
 							<a href={`tel:${settings.phone}`} className="hover:underline">
 								{settings.phone}
 							</a>
 						</li>
 						<li className="flex gap-3 items-center">
-							<Mail size={16} className="text-[var(--moss)]" />{" "}
+							<Mail size={16} className="text-[var(--sage)]" />{" "}
 							<a href={`mailto:${settings.email}`} className="hover:underline">
 								{settings.email}
 							</a>

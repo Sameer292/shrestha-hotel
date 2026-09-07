@@ -5,7 +5,7 @@ export default function Footer() {
 	const s = mockSettings;
 	const year = new Date().getFullYear();
 	return (
-		<footer className="bg-[var(--forest)] text-[var(--cream)]">
+		<footer className="bg-[var(--gold)] text-[var(--cream)]">
 			<div className="container-outer py-14 md:py-16">
 				<div className="grid md:grid-cols-12 gap-10">
 					<div className="md:col-span-5">
@@ -116,7 +116,7 @@ export default function Footer() {
 						<div className="flex gap-3 mt-5">
 							<Link
 								href="/booking"
-								className="bg-white text-[var(--forest)] px-6 py-2.5 rounded-full text-sm font-medium hover:bg-white/90 transition"
+								className="bg-[var(--forest)] text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition"
 							>
 								Book Your Stay
 							</Link>
@@ -124,7 +124,7 @@ export default function Footer() {
 								href={s.googleMapsUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="border border-white/20 px-6 py-2.5 rounded-full text-sm hover:bg-white/10 transition"
+								className="border border-white/25 px-6 py-2.5 rounded-full text-sm hover:bg-white/10 transition"
 							>
 								Directions
 							</a>

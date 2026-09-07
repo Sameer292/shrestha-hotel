@@ -17,7 +17,7 @@ export default function NotFound() {
 				<div className="flex gap-3 justify-center mt-8">
 					<Link
 						href="/"
-						className="bg-[var(--forest)] text-white px-7 py-3 rounded-full text-sm font-medium"
+						className="bg-[var(--gold)] text-white px-7 py-3 rounded-full text-sm font-medium"
 					>
 						Return Home
 					</Link>

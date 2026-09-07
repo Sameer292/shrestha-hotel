@@ -1,19 +1,29 @@
 @import "tailwindcss";
 
 :root {
-	--cream: #faf7f2;
-	--cream-2: #f5f0e8;
-	--stone: #e8e0d5;
-	--sand: #d6c7b8;
-	--forest: #1b2f23;
-	--forest-2: #243a2e;
-	--moss: #4a6741;
-	--sage: #a8b5a0;
-	--charcoal: #1a1a18;
-	--ink: #2c2c2a;
-	--muted: #6b6b63;
-	--line: #e8e0d5;
-	--accent: #c9a86a;
+	/* Premium palette — white / navy / gold */
+	--cream: #fefcfa;
+	--cream-2: #f6f1e6;
+	--stone: #e9dfc5;
+	--sand: #d4c4a0;
+	/* primary navy (replaces forest) */
+	--forest: #0a1f3f;
+	--forest-2: #14305c;
+	--navy: #0a1f3f;
+	--navy-soft: #1e3a5f;
+	/* gold = primary, royal blue = accent */
+	--moss: #8c6a2b;
+	--sage: #2b5cab;
+	--gold: #977235;
+	--gold-light: #a8863f;
+	--gold-deep: #7c5f27;
+	--royal: #2b5cab;
+	--royal-soft: #e4ebf8;
+	--charcoal: #0a1f3f;
+	--ink: #1e2d45;
+	--muted: #6f7d95;
+	--line: #ece0c3;
+	--accent: #977235;
 }
 
 @theme inline {
@@ -23,8 +33,15 @@
 	--color-sand: var(--sand);
 	--color-forest: var(--forest);
 	--color-forest-2: var(--forest-2);
+	--color-navy: var(--navy);
+	--color-navy-soft: var(--navy-soft);
 	--color-moss: var(--moss);
 	--color-sage: var(--sage);
+	--color-royal: var(--royal);
+	--color-royal-soft: var(--royal-soft);
+	--color-gold: var(--gold);
+	--color-gold-light: var(--gold-light);
+	--color-gold-deep: var(--gold-deep);
 	--color-charcoal: var(--charcoal);
 	--color-ink: var(--ink);
 	--color-muted: var(--muted);
@@ -61,8 +78,8 @@ body {
 }
 
 ::selection {
-	background: var(--forest);
-	color: var(--cream);
+	background: var(--gold);
+	color: var(--forest);
 }
 
 /* Typography scale - editorial */
@@ -102,7 +119,7 @@ body {
 
 /* Focus */
 :focus-visible {
-	outline: 2px solid var(--forest);
+	outline: 2px solid var(--gold);
 	outline-offset: 2px;
 }
 

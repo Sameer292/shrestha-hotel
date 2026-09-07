@@ -139,7 +139,7 @@ export default function BookingPage() {
 					<button
 						type="submit"
 						disabled={status === "loading"}
-						className="w-full bg-[var(--forest)] text-white py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition disabled:opacity-60"
+						className="w-full bg-[var(--gold)] text-white py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition disabled:opacity-60"
 					>
 						{status === "loading" ? "Sending…" : "Send Inquiry"}
 					</button>

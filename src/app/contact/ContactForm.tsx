@@ -136,7 +136,7 @@ export default function ContactForm() {
 			<button
 				type="submit"
 				disabled={status === "loading"}
-				className="bg-[var(--forest)] text-white px-7 py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition disabled:opacity-60"
+				className="bg-[var(--gold)] text-white px-7 py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition disabled:opacity-60"
 			>
 				{status === "loading" ? "Sending…" : "Send Message"}
 			</button>

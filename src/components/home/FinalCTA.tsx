@@ -21,7 +21,7 @@ export default function FinalCTA({
 					unoptimized
 					sizes="100vw"
 				/>
-				<div className="absolute inset-0 bg-[var(--forest)]/55" />
+				<div className="absolute inset-0 bg-[var(--gold)]/70" />
 			</div>
 			<div className="relative z-10 container-outer py-20 md:py-28 text-center text-white">
 				<h2 className="display text-[36px] md:text-[52px] max-w-[12ch] mx-auto leading-none">
@@ -33,7 +33,7 @@ export default function FinalCTA({
 				<div className="flex gap-3 justify-center mt-8">
 					<Link
 						href="/booking"
-						className="bg-white text-[var(--forest)] px-8 py-3 rounded-full text-sm font-medium hover:bg-white/90 transition"
+						className="bg-[var(--forest)] text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition"
 					>
 						Book Your Stay
 					</Link>

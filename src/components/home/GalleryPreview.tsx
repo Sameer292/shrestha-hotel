@@ -8,7 +8,7 @@ import type { GalleryItem } from "@/lib/wordpress/types";
 export default function GalleryPreview({ items }: { items: GalleryItem[] }) {
 	const [idx, setIdx] = useState<number | null>(null);
 	return (
-		<section className="py-16 md:py-20 bg-[var(--forest)] text-[var(--cream)]">
+		<section className="py-16 md:py-20 bg-[var(--gold)] text-[var(--cream)]">
 			<div className="container-outer">
 				<div className="flex justify-between items-end mb-8">
 					<div>

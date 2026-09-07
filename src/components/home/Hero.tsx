@@ -95,7 +95,7 @@ export default function Hero({
 					<div className="hero-ctas flex flex-wrap gap-3 mt-8">
 						<Link
 							href="/booking"
-							className="bg-white text-[var(--forest)] px-7 py-3 rounded-full text-sm font-medium inline-flex items-center gap-2 hover:bg-white/90 transition"
+							className="bg-[var(--forest)] text-white px-7 py-3 rounded-full text-sm font-medium inline-flex items-center gap-2 hover:bg-[var(--forest-2)] transition"
 						>
 							{data.primaryCta} <ArrowRight size={14} />
 						</Link>

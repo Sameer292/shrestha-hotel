@@ -16,7 +16,7 @@ export function Button({
 	const base =
 		"inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-medium tracking-wide transition-all group";
 	const styles = {
-		dark: "bg-[var(--forest)] text-white hover:bg-[var(--forest-2)]",
+		dark: "bg-[var(--gold)] text-white hover:bg-[var(--forest-2)]",
 		light: "bg-white text-[var(--forest)] hover:bg-white/90",
 		outline:
 			"border border-[var(--forest)] text-[var(--forest)] hover:bg-[var(--forest)] hover:text-white",

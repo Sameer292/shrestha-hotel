@@ -85,7 +85,7 @@ export default async function ExperiencePage({
 						</p>
 						<Link
 							href="/booking"
-							className="mt-4 block text-center bg-[var(--forest)] text-white py-3 rounded-full text-sm font-medium"
+							className="mt-4 block text-center bg-[var(--gold)] text-white py-3 rounded-full text-sm font-medium"
 						>
 							Enquire to Book
 						</Link>

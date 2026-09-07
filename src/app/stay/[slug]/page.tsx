@@ -131,7 +131,7 @@ export default async function RoomPage({
 						</div>
 						<Link
 							href="/booking"
-							className="mt-5 block text-center bg-[var(--forest)] text-white py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition"
+							className="mt-5 block text-center bg-[var(--gold)] text-white py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition"
 						>
 							Check Availability
 						</Link>

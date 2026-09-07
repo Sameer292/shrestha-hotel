@@ -18,7 +18,7 @@ export default function HotSpringFeature({
 	return (
 		<section className="py-6 md:py-10">
 			<div className="container-outer">
-				<div className="bg-[var(--forest)] rounded-[24px] overflow-hidden grid lg:grid-cols-12 text-[var(--cream)]">
+				<div className="bg-[var(--gold)] rounded-[24px] overflow-hidden grid lg:grid-cols-12 text-[var(--cream)]">
 					<div className="lg:col-span-6 relative min-h-[420px] lg:min-h-[560px]">
 						<Image
 							src={image.url}
@@ -71,7 +71,7 @@ export default function HotSpringFeature({
 						</ul>
 						<Link
 							href="/hot-spring"
-							className="mt-8 inline-flex items-center gap-2 bg-white text-[var(--forest)] px-7 py-3 rounded-full text-sm font-medium w-fit hover:bg-white/90 transition"
+							className="mt-8 inline-flex items-center gap-2 bg-[var(--forest)] text-white px-7 py-3 rounded-full text-sm font-medium w-fit hover:bg-[var(--forest-2)] transition"
 						>
 							Discover the Hot Spring <ArrowUpRight size={14} />
 						</Link>
