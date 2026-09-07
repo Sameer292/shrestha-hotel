@@ -2,19 +2,30 @@
 import { useState } from "react";
 
 export default function BookingPage() {
-	const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+	const [status, setStatus] = useState<
+		"idle" | "loading" | "success" | "error"
+	>("idle");
 	async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const fd = new FormData(e.currentTarget);
 		const data = Object.fromEntries(fd.entries());
 		if (!data.name || !data.email) {
-			alert("Name and email required");
+			setStatus("error");
 			return;
 		}
 		setStatus("loading");
-		await new Promise((r) => setTimeout(r, 900));
-		setStatus("success");
-		(e.target as HTMLFormElement).reset();
+		try {
+			const res = await fetch("/api/booking", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
+			if (!res.ok) throw new Error();
+			setStatus("success");
+			(e.target as HTMLFormElement).reset();
+		} catch {
+			setStatus("error");
+		}
 	}
 	return (
 		<div className="pt-20">
@@ -136,6 +147,20 @@ export default function BookingPage() {
 							availability shortly.
 						</p>
 					)}
+					{status === "error" && (
+						<p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+							Something went wrong. Please check name and email, or contact
+							us directly.
+						</p>
+					)}
+					<input
+						type="text"
+						name="company"
+						tabIndex={-1}
+						autoComplete="off"
+						aria-hidden="true"
+						className="hidden"
+					/>
 					<button
 						type="submit"
 						disabled={status === "loading"}

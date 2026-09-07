@@ -53,3 +53,36 @@ export const inquirySchema = z.object({
 	subject: z.string().min(2),
 	message: z.string().min(10),
 });
+export const bookingSchema = z.object({
+	checkin: z.string().min(4),
+	checkout: z.string().min(4),
+	adults: z.string().optional(),
+	children: z.string().optional(),
+	room: z.string().optional(),
+	name: z.string().min(2),
+	email: z.string().email(),
+	phone: z.string().optional(),
+	requests: z.string().optional(),
+	company: z.string().optional(),
+});
+
+// Server-side forward to the WP inbox (mu-plugins/shrestha-inquiry.php).
+// Returns true when WP stored it. Never throws — callers map false to 502.
+export async function forwardInquiry(
+	body: Record<string, unknown>,
+): Promise<boolean> {
+	const api = process.env.WORDPRESS_API_URL || "";
+	const base = api.replace(/\/graphql\/?$/, "");
+	if (!base) return false;
+	try {
+		const res = await fetch(`${base}/wp-json/sh/v1/inquiry`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(body),
+			cache: "no-store",
+		});
+		return res.ok;
+	} catch {
+		return false;
+	}
+}

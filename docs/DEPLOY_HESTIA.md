@@ -42,6 +42,13 @@ Rule: never add app routes under `/wp-*`. `xmlrpc.php` is blocked outright.
    `scripts/acf-json/*` → `wp-content/sh-acf-json/`
 6. Enter content: Rooms/Experiences/Testimonials/Gallery/FAQs + the
    **Hotel Content** page, with featured images.
+7. Mail: the contact/booking forms POST to Next (`/api/contact`,
+   `/api/booking`), which forward to WP (`sh/v1/inquiry`). WP stores each as
+   a private **Inquiries** entry (always checkable in wp-admin) and emails it
+   via `wp_mail` (Hestia Exim). Verify deliverability once with
+   https://www.mail-tester.com — if mail lands in spam, add the SPF/DKIM
+   records Hestia generates (panel: Mail/Email deliverability) and consider
+   an SMTP plugin as fallback.
 
 ## 3. Next.js proxy template (with `/cms/` passthrough)
 

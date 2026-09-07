@@ -52,6 +52,14 @@ it** — reserved for a future offers section, safely ignorable.
 fields) + Hero / Intro / Hot Spring / Dining / Final CTA / **About** sections
 — ✅ all ready, editable at WP Admin → Hotel Content.
 
+## Forms (not mock — real delivery)
+
+Contact (`/contact`) and booking (`/booking`) POST JSON to Next
+(`/api/contact`, `/api/booking`), validated with zod, forwarded to WP
+(`POST sh/v1/inquiry`). WP stores a **private Inquiry** post (wp-admin →
+Inquiries) and emails the hotel address (best-effort). Anti-spam: hidden
+honeypot field + 5/hour per IP. Test: submit → entry appears in Inquiries.
+
 ## Fresh-machine order
 
 `scripts/dev.sh` → `migrate-content.sh` → `set-room-meta.sh` →

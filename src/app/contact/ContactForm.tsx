@@ -25,11 +25,18 @@ export default function ContactForm() {
 		}
 		setErrors({});
 		setStatus("loading");
-		// No real backend — simulate and show success. In prod, POST to /api/contact or WP.
-		await new Promise((r) => setTimeout(r, 900));
-		// ponytail: no real email delivery yet — wire to WP/Resend later
-		setStatus("success");
-		(e.target as HTMLFormElement).reset();
+		try {
+			const res = await fetch("/api/contact", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
+			if (!res.ok) throw new Error();
+			setStatus("success");
+			(e.target as HTMLFormElement).reset();
+		} catch {
+			setStatus("error");
+		}
 	}
 
 	return (
@@ -120,8 +127,7 @@ export default function ContactForm() {
 					role="status"
 					className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3"
 				>
-					Thank you — your message has been received. We’ll reply soon. (Inquiry
-					mode — wire to email/WP when ready.)
+				Thank you — your message has been received. We’ll reply soon.
 				</p>
 			)}
 			{status === "error" && (
@@ -133,6 +139,14 @@ export default function ContactForm() {
 				</p>
 			)}
 
+			<input
+				type="text"
+				name="company"
+				tabIndex={-1}
+				autoComplete="off"
+				aria-hidden="true"
+				className="hidden"
+			/>
 			<button
 				type="submit"
 				disabled={status === "loading"}

@@ -72,6 +72,20 @@ add_action('init', function () {
             'menu_icon' => 'dashicons-editor-help',
             'has_archive' => false,
         ],
+        // Private inbox for contact/booking forms — visible in wp-admin only
+        'inquiry' => [
+            'label' => 'Inquiries',
+            'public' => false,
+            'show_ui' => true,
+            'show_in_menu' => true,
+            'show_in_graphql' => false,
+            'show_in_rest' => false,
+            'supports' => ['title', 'editor', 'custom-fields'],
+            'menu_icon' => 'dashicons-email',
+            'has_archive' => false,
+            'capabilities' => ['create_posts' => false],
+            'map_meta_cap' => true,
+        ],
     ];
 
     foreach ($cpts as $post_type => $args) {
