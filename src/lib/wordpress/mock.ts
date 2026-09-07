@@ -4,7 +4,6 @@ import type {
 	GalleryItem,
 	HomeContent,
 	HotelSettings,
-	Offer,
 	Room,
 	Testimonial,
 } from "./types";
@@ -116,6 +115,11 @@ export const mockHome: HomeContent = {
 		description:
 			"Let the hot spring hold the day's quiet. Let the mountains do the rest.",
 		image: img(curated.finalCta, 1920, 900, "Misty Himalayan ridge at sunrise"),
+	},
+	about: {
+		heading: "Hospitality,\nheld lightly",
+		body: "Shrestha Hotel Hotspring began with a simple idea: a small place where people could be well — warm water, good food, and the quiet that the mountains do naturally.\n\nWe are a family-run retreat in Myagdi, built from local stone and timber, served by people from nearby villages.",
+		image: img(curated.intro1, 1000, 750, "Timber lodge interior with warm light"),
 	},
 };
 
@@ -446,18 +450,5 @@ export const mockFaqs: FAQ[] = [
 			"Yes — we have family rooms and interconnecting options. Please mention children's ages when booking.",
 		category: "Stay",
 		displayOrder: 4,
-	},
-];
-
-export const mockOffers: Offer[] = [
-	{
-		slug: "winter-warmth",
-		title: "Winter Warmth — 3 Nights",
-		description:
-			"Three nights, daily hot spring, breakfast and a guided ridge walk. For slow winter light.",
-		image: img(curated.room1, 800, 600, "Winter light over mountains"),
-		price: "From NPR 42,000",
-		validity: "Dec — Feb",
-		featured: true,
 	},
 ];

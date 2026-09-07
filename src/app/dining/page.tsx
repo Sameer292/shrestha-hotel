@@ -1,11 +1,13 @@
 import Image from "next/image";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
-import { mockHome } from "@/lib/wordpress/mock";
+import { getHomeContent } from "@/lib/wordpress/queries";
 
 export const metadata = { title: "Dining — From the Mountains to the Table" };
+export const revalidate = 10;
 
-export default function DiningPage() {
-	const d = mockHome.dining;
+export default async function DiningPage() {
+	const home = await getHomeContent();
+	const d = home.dining;
 	return (
 		<div className="pt-20">
 			<div className="container-outer pt-8">

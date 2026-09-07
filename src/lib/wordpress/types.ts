@@ -106,15 +106,6 @@ export type HomeContent = {
 	};
 	dining: { heading: string; text: string; images: Media[]; cta: string };
 	finalCta: { heading: string; description: string; image: Media };
+	about: { heading: string; body: string; image: Media };
 };
 
-export type Offer = {
-	slug: string;
-	title: string;
-	description: string;
-	image: Media;
-	price?: string;
-	validity?: string;
-	terms?: string;
-	featured: boolean;
-};

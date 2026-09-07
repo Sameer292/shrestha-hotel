@@ -7,9 +7,10 @@
 
 if (!defined('ABSPATH')) exit;
 
-// Load ACF field groups from local JSON
+// Load ACF field groups from local JSON (theme path + persistent path that survives theme switches)
 add_filter('acf/settings/load_json', function ($paths) {
     $paths[] = get_stylesheet_directory() . '/acf-json';
+    $paths[] = WP_CONTENT_DIR . '/sh-acf-json';
     return $paths;
 });
 

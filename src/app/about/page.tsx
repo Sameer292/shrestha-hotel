@@ -1,33 +1,29 @@
 import Image from "next/image";
+import { getHomeContent } from "@/lib/wordpress/queries";
 
 export const metadata = { title: "About — Our Story" };
+export const revalidate = 10;
 
-export default function AboutPage() {
+export default async function AboutPage() {
+	const home = await getHomeContent();
+	const a = home.about;
 	return (
 		<div className="pt-20">
 			<div className="container-outer pt-8 pb-10">
 				<p className="eyebrow text-[var(--moss)]">About</p>
-				<h1 className="display text-[40px] md:text-[56px] text-[var(--forest)] leading-none mt-2 max-w-[12ch]">
-					Hospitality, held
-					<br />
-					lightly
+				<h1 className="display text-[40px] md:text-[56px] text-[var(--forest)] leading-none mt-2 max-w-[12ch] whitespace-pre-line">
+					{a.heading}
 				</h1>
 				<div className="grid lg:grid-cols-12 gap-8 mt-8">
 					<div className="lg:col-span-6">
-						<p className="text-[15px] leading-[1.8] text-[var(--muted)]">
-							Shrestha Hotel Hotspring began with a simple idea: a small place
-							where people could be well — warm water, good food, and the quiet
-							that the mountains do naturally. We are not a large resort. We are
-							a family-run retreat in Myagdi, built from local stone and timber,
-							served by people from nearby villages who know the trails, the
-							seasons, and how to remember your name.
-						</p>
-						<p className="text-[15px] leading-[1.8] text-[var(--muted)] mt-4">
-							We don’t claim certifications we haven’t earned or tell stories
-							that aren’t ours. What we can promise is care: clean rooms, warm
-							spring, honest food, and hospitality that feels like being
-							welcomed into a home rather than processed through a hotel.
-						</p>
+						{a.body.split(/\n\n+/).map((p, i) => (
+							<p
+								key={i}
+								className="text-[15px] leading-[1.8] text-[var(--muted)] mt-4 first:mt-0"
+							>
+								{p}
+							</p>
+						))}
 						<div className="grid grid-cols-3 gap-4 mt-8">
 							{[
 								{ k: "Local", v: "Built and run with Myagdi families" },
@@ -51,18 +47,14 @@ export default function AboutPage() {
 					<div className="lg:col-span-6">
 						<div className="relative aspect-[4/3] rounded-[20px] overflow-hidden">
 							<Image
-								src="https://picsum.photos/seed/about1/1000/750"
-								alt="Hotel exterior"
+								src={a.image.url}
+								alt={a.image.alt}
 								fill
 								className="object-cover"
 								unoptimized
 								sizes="600px"
 							/>
 						</div>
-						<p className="text-xs text-[var(--muted)] mt-3">
-							Placeholder image — replace with actual hotel photography via
-							WordPress. References are centralized for easy swap.
-						</p>
 					</div>
 				</div>
 			</div>

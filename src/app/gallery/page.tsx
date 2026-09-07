@@ -1,8 +1,9 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Lightbox from "@/components/common/Lightbox";
 import { mockGallery } from "@/lib/wordpress/mock";
+import type { GalleryItem } from "@/lib/wordpress/types";
 
 const cats = [
 	"All",
@@ -17,8 +18,17 @@ const cats = [
 export default function GalleryPage() {
 	const [cat, setCat] = useState("All");
 	const [idx, setIdx] = useState<number | null>(null);
+	const [items, setItems] = useState<GalleryItem[]>(mockGallery);
+	useEffect(() => {
+		fetch("/api/gallery")
+			.then((r) => (r.ok ? r.json() : null))
+			.then((d) => {
+				if (Array.isArray(d) && d.length) setItems(d);
+			})
+			.catch(() => {});
+	}, []);
 	const filtered =
-		cat === "All" ? mockGallery : mockGallery.filter((g) => g.category === cat);
+		cat === "All" ? items : items.filter((g) => g.category === cat);
 	const images = filtered.map((g) => g.image);
 	return (
 		<div className="pt-20">
@@ -32,7 +42,7 @@ export default function GalleryPage() {
 						<button
 							key={c}
 							onClick={() => setCat(c)}
-							className={`px-4 py-1.5 rounded-full text-sm border transition ${cat === c ? "bg-[var(--forest)] text-white border-[var(--forest)]" : "bg-white border-[var(--line)] hover:bg-[var(--cream-2)]"}`}
+							className={`px-4 py-1.5 rounded-full text-sm border transition ${cat === c ? "bg-[var(--gold)] text-white border-[var(--gold)]" : "bg-white border-[var(--line)] hover:bg-[var(--cream-2)]"}`}
 						>
 							{c}
 						</button>

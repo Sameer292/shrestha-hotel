@@ -13,7 +13,7 @@ WordPress lives at `https://cms.shresthahotel.com` and is **never** used to rend
 Install & activate:
 
 - **WPGraphQL** — https://wordpress.org/plugins/wp-graphql/
-- **Advanced Custom Fields (ACF) Pro** — field groups + Options Pages
+- **Advanced Custom Fields (ACF)** free — field groups (Options Pages are Pro-only; we don't use them)
 - **WPGraphQL for ACF** — exposes ACF fields in GraphQL (https://github.com/wp-graphql/wpgraphql-acf)
 - Optional: **Yoast SEO** or **Rank Math** for SEO fields → consumed in `metadata`
 
@@ -40,7 +40,7 @@ Assign a featured image to every post; alt text is required.
 
 For each CPT, create an ACF field group with location = Post Type is equal to that CPT.
 
-**Room fields** (field names must match `types.ts`): `startingPrice` (number), `currency` (select NPR/USD), `capacity` (number), `adults`, `children`, `bedType` (text), `roomSize` (text e.g. "38 m²"), `view` (text), `amenities` (repeater → text), `checkIn`, `checkOut`, `featured` (true/false), `displayOrder` (number), `gallery` (gallery). Long description = post content; short = excerpt. Also add SEO fields if not using Yoast.
+**Room fields** (field names must match `types.ts`): `startingPrice` (number), `currency` (select NPR/USD), `capacity` (number), `adults`, `children`, `bedType` (text), `roomSize` (text e.g. "38 m²"), `view` (text), `amenities` (text, comma-separated), `checkIn`, `checkOut`, `featured` (true/false), `displayOrder` (number), `gallery` (gallery). Long description = post content; short = excerpt. Also add SEO fields if not using Yoast.
 
 **Experience**: `duration`, `difficulty`, `season`, `optionalPrice`, `featured`, `gallery`.
 
@@ -52,18 +52,18 @@ For each CPT, create an ACF field group with location = Post Type is equal to th
 
 Organize fields into tabs: Basic Information / Details / Amenities / Images / Pricing / SEO — keep it pleasant for hotel staff.
 
-## 5. Global settings — ACF Options Pages
+## 5. Global settings — Hotel Content page (no ACF Pro needed)
 
-```php
-if (function_exists('acf_add_options_page')) {
-  acf_add_options_page(['page_title'=>'Hotel Settings','menu_slug'=>'hotel-settings','capability'=>'edit_posts']);
-  acf_add_options_page(['page_title'=>'Homepage','menu_slug'=>'homepage-settings']);
-}
-```
+`scripts/mu-plugins/shrestha-settings.php` registers a **Hotel Content** admin
+page (options + GraphQL `hotelSettings` / `homeContent`) — this replaces ACF
+Options Pages, which are Pro-only.
 
-Hotel Settings fields: `hotelName`, `tagline`, `logo`, `favicon`, `phone`, `secondaryPhone`, `email`, `whatsapp`, `address`, `googleMapsUrl`, `googleMapsEmbed`, `latitude`, `longitude`, `instagram`, `facebook`, `tiktok`, `tripadvisor`, `bookingUrl`, `checkIn`, `checkOut`, `currency`, `footerDescription`.
+Hotel Settings fields: `hotelName`, `tagline`, `phone`, `secondaryPhone`,
+`email`, `whatsapp`, `address`, `googleMapsUrl`, `googleMapsEmbed`,
+`latitude`, `longitude`, `instagram`, `facebook`, `tripadvisor`, `bookingUrl`,
+`checkIn`, `checkOut`, `currency`, `footerDescription`.
 
-Homepage fields: hero { eyebrow, heading, description, image, primaryCta, secondaryCta }, intro { heading, body, images }, hotSpring { heading, text, image, temperature, hours }, dining { heading, text, images }, finalCta { heading, description, image }.
+Homepage sections: hero { eyebrow, heading, subheading, image, primaryCta, secondaryCta }, intro { heading, body, images }, hotSpring { heading, text, image, temperature, hours, cta }, dining { heading, text, images, cta }, finalCta { heading, description, image }, about { heading, body, image }.
 
 All GraphQL queries in `src/lib/wordpress/queries.ts` read these — extend there when you add fields.
 
@@ -79,22 +79,13 @@ Endpoint: `https://cms.shresthahotel.com/graphql`
 - Upload featured images + gallery at 1600px+ wide; WP will serve responsive sizes and `next/image` handles optimization.
 - Always fill Alt Text — it becomes `alt` in the frontend.
 
-## 8. Revalidation
+## 8. Revalidation — automatic
 
-In `functions.php` or a small plugin, after saving relevant post types/options, call Next.js:
-
-```php
-add_action('save_post', function($post_id){
-  if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) return;
-  wp_remote_post('https://www.shresthahotel.com/api/revalidate', [
-    'headers' => ['x-revalidate-secret' => getenv('REVALIDATE_SECRET'), 'Content-Type'=>'application/json'],
-    'body' => json_encode(['path' => '/']),
-    'timeout' => 5,
-  ]);
-}, 10, 1);
-```
-
-Keep `REVALIDATE_SECRET` in WP env (not in the repo) — same value as Next.js `REVALIDATE_SECRET`.
+`shrestha-settings.php` pings Next.js `/api/revalidate` on every save of our
+post types and on Hotel Content updates (non-blocking, 3s timeout). Configure
+via env (`NEXT_APP_URL`, `REVALIDATE_SECRET`) in Docker, or `wp-config.php`
+constants on Hestia. Keep `REVALIDATE_SECRET` out of the repo — same value as
+Next.js `REVALIDATE_SECRET`.
 
 ## 9. Editor workflow
 

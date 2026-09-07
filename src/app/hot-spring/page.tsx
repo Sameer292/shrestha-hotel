@@ -1,14 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { mockHome } from "@/lib/wordpress/mock";
-import { getFaqs } from "@/lib/wordpress/queries";
+import { getFaqs, getHomeContent } from "@/lib/wordpress/queries";
 
 export const revalidate = 10;
 export const metadata = { title: "Hot Spring — Natural Mineral Baths" };
 
 export default async function HotSpringPage() {
-	const faqs = await getFaqs();
-	const hs = mockHome.hotSpring;
+	const [faqs, home] = await Promise.all([getFaqs(), getHomeContent()]);
+	const hs = home.hotSpring;
 	return (
 		<div className="pt-20">
 			<div className="relative h-[62vh] min-h-[420px] overflow-hidden bg-[var(--forest)]">
@@ -80,7 +79,7 @@ export default async function HotSpringPage() {
 					</ul>
 				</div>
 				<div className="lg:col-span-5">
-					<div className="bg-[var(--forest)] text-[var(--cream)] rounded-[20px] p-7">
+					<div className="bg-[var(--gold)] text-[var(--cream)] rounded-[20px] p-7">
 						<h3 className="font-display text-xl">Plan your soak</h3>
 						<p className="text-sm text-white/70 mt-2 leading-relaxed">
 							The spring is best at dawn and after walks. Staying guests have
@@ -89,7 +88,7 @@ export default async function HotSpringPage() {
 						</p>
 						<Link
 							href="/booking"
-							className="mt-6 inline-flex bg-white text-[var(--forest)] px-6 py-2.5 rounded-full text-sm font-medium"
+							className="mt-6 inline-flex bg-[var(--forest)] text-white px-6 py-2.5 rounded-full text-sm font-medium"
 						>
 							Stay to Soak
 						</Link>

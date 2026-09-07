@@ -20,6 +20,15 @@ import type {
 
 const isProd = process.env.NODE_ENV === "production";
 
+// WP media URLs come back absolute (http://shrestha.localhost:8081/…),
+// which other devices can't resolve. Strip to a relative path — both the
+// dev proxy and prod nginx route /wp-content/* to WordPress, and
+// next.config rewrites cover direct :3000 access.
+export function wpMedia(url: string): string {
+	const i = url.indexOf("/wp-content/uploads/");
+	return i >= 0 ? url.slice(i) : url;
+}
+
 async function withFallback<T>(
 	wpData: T | null,
 	mock: T,
@@ -57,6 +66,7 @@ type WPRoomNode = {
 		checkout?: string | null;
 		featured?: boolean | null;
 		displayorder?: number | null;
+		gallery?: { sourceUrl: string; altText: string }[] | null;
 	} | null;
 };
 type WPExpNode = {
@@ -119,14 +129,16 @@ function mapRoom(n: WPRoomNode, idx = 0): Room {
 		description: n.content?.replace(/<[^>]*>/g, "").trim() || n.excerpt || "",
 		featuredImage: n.featuredImage?.node
 			? {
-					url: n.featuredImage.node.sourceUrl,
+					url: wpMedia(n.featuredImage.node.sourceUrl),
 					alt: n.featuredImage.node.altText || n.title,
 				}
 			: {
 					url: CURATED_FALLBACKS.room[idx % CURATED_FALLBACKS.room.length],
 					alt: n.title,
 				},
-		gallery: [],
+		gallery: (f?.gallery ?? [])
+			.filter((g) => g?.sourceUrl)
+			.map((g) => ({ url: wpMedia(g.sourceUrl), alt: g.altText || n.title })),
 		startingPrice: f?.startingprice ?? undefined,
 		currency: f?.currency ?? "NPR",
 		capacity: f?.capacity ?? 2,
@@ -140,12 +152,12 @@ function mapRoom(n: WPRoomNode, idx = 0): Room {
 			: [],
 		checkIn: f?.checkin ?? "2:00 PM",
 		checkOut: f?.checkout ?? "11:00 AM",
-		featured: f?.featured ?? true,
+		featured: f?.featured ?? false,
 		displayOrder: f?.displayorder ?? idx,
 	};
 }
 
-function mapExperience(n: WPExpNode, idx = 0): Experience {
+function mapExperience(n: WPExpNode): Experience {
 	const f = n.experienceFields;
 	return {
 		slug: n.slug,
@@ -154,7 +166,7 @@ function mapExperience(n: WPExpNode, idx = 0): Experience {
 		description: n.content?.replace(/<[^>]*>/g, "").trim() || "",
 		featuredImage: n.featuredImage?.node
 			? {
-					url: n.featuredImage.node.sourceUrl,
+					url: wpMedia(n.featuredImage.node.sourceUrl),
 					alt: n.featuredImage.node.altText || n.title,
 				}
 			: {
@@ -165,7 +177,7 @@ function mapExperience(n: WPExpNode, idx = 0): Experience {
 		duration: f?.duration ?? undefined,
 		difficulty: f?.difficulty ?? undefined,
 		season: f?.season ?? undefined,
-		featured: f?.featured ?? true,
+		featured: f?.featured ?? false,
 	};
 }
 
@@ -173,9 +185,18 @@ function mapExperience(n: WPExpNode, idx = 0): Experience {
 // QUERIES
 // ============================================
 
+const SETTINGS_FIELDS = `
+	hotelName tagline phone secondaryPhone email whatsapp address
+	googleMapsUrl googleMapsEmbed latitude longitude
+	instagram facebook tripadvisor bookingUrl
+	checkIn checkOut currency footerDescription
+`;
+const MEDIA_FIELDS = `image { url alt }`;
+const MEDIA_LIST = `images { url alt }`;
+
 export async function getHotelSettings(): Promise<HotelSettings> {
 	const data = await wpFetch<{ hotelSettings: HotelSettings | null }>(
-		`query { hotelSettings { hotelName } }`,
+		`query { hotelSettings { ${SETTINGS_FIELDS} } }`,
 	);
 	return withFallback(
 		data?.hotelSettings ?? null,
@@ -186,9 +207,29 @@ export async function getHotelSettings(): Promise<HotelSettings> {
 
 export async function getHomeContent(): Promise<HomeContent> {
 	const data = await wpFetch<{ homeContent: HomeContent | null }>(
-		`query { homeContent { hero } }`,
+		`query { homeContent {
+			hero { eyebrow heading subheading ${MEDIA_FIELDS} primaryCta secondaryCta }
+			intro { heading body ${MEDIA_LIST} }
+			hotSpring { heading text ${MEDIA_FIELDS} temperature hours cta }
+			dining { heading text ${MEDIA_LIST} cta }
+			finalCta { heading description ${MEDIA_FIELDS} }
+			about { heading body ${MEDIA_FIELDS} }
+		} }`,
 	);
-	return withFallback(data?.homeContent ?? null, mockHome, "getHomeContent");
+	const home = data?.homeContent ?? null;
+	if (home) {
+		const fix = (m: { url: string; alt: string }) => ({
+			...m,
+			url: wpMedia(m.url),
+		});
+		home.hero.image = fix(home.hero.image);
+		home.intro.images = home.intro.images.map(fix);
+		home.hotSpring.image = fix(home.hotSpring.image);
+		home.dining.images = home.dining.images.map(fix);
+		home.finalCta.image = fix(home.finalCta.image);
+		home.about.image = fix(home.about.image);
+	}
+	return withFallback(home, mockHome, "getHomeContent");
 }
 
 export async function getRooms(): Promise<Room[]> {
@@ -202,6 +243,7 @@ export async function getRooms(): Promise<Room[]> {
 						startingprice currency capacity adults children
 						bedtype roomsize view amenities
 						checkin checkout featured displayorder
+						gallery { sourceUrl altText }
 					}
 				}
 			}
@@ -239,7 +281,7 @@ export async function getExperiences(): Promise<Experience[]> {
 	if (!data) return withFallback(null, mockExperiences, "getExperiences");
 	if (!data.experiences?.nodes || data.experiences.nodes.length === 0)
 		return [];
-	return data.experiences.nodes.map((n, i) => mapExperience(n, i));
+	return data.experiences.nodes.map((n) => mapExperience(n));
 }
 
 export async function getExperienceBySlug(
@@ -274,7 +316,7 @@ export async function getTestimonials(): Promise<Testimonial[]> {
 			guestLocation: f?.guestlocation ?? "",
 			quote: contentText || f?.quote || "",
 			rating: f?.rating ?? undefined,
-			featured: f?.featured ?? true,
+			featured: f?.featured ?? false,
 		};
 	});
 }
@@ -303,7 +345,7 @@ export async function getGallery(): Promise<GalleryItem[]> {
 		return {
 			image: n.featuredImage?.node
 				? {
-						url: n.featuredImage.node.sourceUrl,
+						url: wpMedia(n.featuredImage.node.sourceUrl),
 						alt: n.featuredImage.node.altText || n.title,
 					}
 				: { url: CURATED_FALLBACKS.gallery, alt: n.title },

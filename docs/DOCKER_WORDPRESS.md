@@ -1,36 +1,53 @@
 # Docker WordPress (local headless CMS)
 
 One command local CMS — no hosting needed. Data lives in Docker volumes `db_data` / `wp_data`.
+WordPress is **content-admin only**: visitors never see it, Next.js renders everything.
 
-## Quick start
+## Quick start (fresh machine)
 
 ```bash
+bash scripts/dev.sh   # docker (db + WP + proxy) then Next.js; bootstraps WP on first run
+# --- everything below happens automatically; manual equivalents follow ---
 docker compose up -d
-# wait ~15s for DB healthcheck, then:
-bash scripts/wp-setup.sh http://localhost:8080
-# or without script, open http://localhost:8080 and finish WP installer in browser
+bash scripts/wp-setup.sh http://cms.shrestha.localhost:8081   # core + plugins + CPTs + ACF JSON
+bash scripts/migrate-content.sh   # rooms, experiences, testimonials, gallery, FAQs
+bash scripts/set-room-meta.sh && bash scripts/set-all-meta.sh  # ACF field values
+# featured images (one WP-CLI run, idempotent):
+docker compose cp scripts/seed-images.php wordpress:/var/www/html/seed-images.php
+docker compose run --rm wpcli --path=/var/www/html eval-file seed-images.php
+docker compose exec wordpress rm -f /var/www/html/seed-images.php
 ```
 
-Then:
+## Single-port dev (mirrors prod)
 
-1. Open `http://localhost:8080/wp-admin` → login `admin / admin123` (change immediately in Users → Profile)
-2. Settings → Permalinks → **Post Name** → Save (already done by script)
-3. Follow `docs/WORDPRESS_SETUP.md:4` to create CPTs + ACF Options Pages (Hotel Settings / Homepage)
+Caddy (`proxy` service) serves everything on **:8081**, one hostname split by path:
 
-## Wire Next.js to it
+| URL | Goes to |
+|---|---|
+| `http://shrestha.localhost:8081/…` | Next.js dev (`bun dev` on host :3000) |
+| `http://shrestha.localhost:8081/wp-admin` | WordPress admin |
+| `http://shrestha.localhost:8081/graphql` | GraphQL API |
 
-`.env.local`:
+Same on LAN by IP: `http://<lan-ip>:8081` and `http://<lan-ip>:8081/wp-admin`
+(`scripts/dev.sh` prints your IP). No per-device setup.
 
-```
-NEXT_PUBLIC_SITE_URL=http://localhost:3001
-WORDPRESS_API_URL=http://localhost:8080/graphql
-WORDPRESS_GRAPHQL_URL=http://localhost:8080/graphql
-REVALIDATE_SECRET=dev-secret
-```
+One-time host setup + restart dev (reads `.env.local`, `next.config.ts`):
 
 ```bash
-bun run dev   # http://localhost:3001 — mock warnings disappear once GraphQL responds
+echo "127.0.0.1 shrestha.localhost" | sudo tee -a /etc/hosts
+bun dev   # restart so new env + allowedDevOrigins apply
 ```
+
+`WORDPRESS_API_URL` already points at the proxy address. `WP_HOME`/`WP_SITEURL`
+are set dynamically in `scripts/mu-plugins/shrestha-settings.php` — they follow
+the request host (whitelisted), so LAN IPs work with zero per-device setup.
+Direct access still works too: app `http://localhost:3000`, WP `http://localhost:8080`.
+
+## Staff workflow
+
+Content team: WP Admin → **Rooms / Experiences / Testimonials / Gallery Items / FAQs**
+to edit entries, **Hotel Content** page for site-wide text (hero, contact, footer…).
+On every save, WordPress pings Next.js (`/api/revalidate`) — pages refresh within ~a minute, no deploy.
 
 Test GraphQL without Next:
 
