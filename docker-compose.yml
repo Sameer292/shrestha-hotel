@@ -1,3 +1,7 @@
+# ============================================================
+# DEV ONLY — local WordPress + Caddy on :8081 (any DB is fine).
+# Prod on Hestia uses docker-compose.hestia.yml (app container only).
+# ============================================================
 services:
   db:
     image: mariadb:10.11
@@ -29,8 +33,29 @@ services:
       WORDPRESS_DB_PASSWORD: shrestha_pass
       WORDPRESS_DB_NAME: shrestha_cms
       WORDPRESS_DEBUG: "1"
+      # Home URL is set dynamically in mu-plugins/shrestha-settings.php
+      # (follows the request host, whitelisted) so LAN IPs work too.
+      # Revalidate hook target (Next dev on host) + shared secret with .env.local
+      NEXT_APP_URL: http://host.docker.internal:3000
+      REVALIDATE_SECRET: dev-secret-change-me
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - wp_data:/var/www/html
+
+  # Single-port entry: :80 → app (host :3000) + CMS, mirroring prod
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - wordpress
+    ports:
+      - "8081:80"
+    volumes:
+      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # one-shot WP-CLI helper — run `docker compose run --rm wpcli <cmd>`
   wpcli:
@@ -53,3 +78,4 @@ services:
 volumes:
   db_data:
   wp_data:
+  caddy_data:

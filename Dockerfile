@@ -11,6 +11,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# baked into the client bundle at build time (has a prod default)
+ARG NEXT_PUBLIC_SITE_URL=https://www.shresthahotel.com
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 RUN bun run build
 
 FROM node:20-alpine AS runner

@@ -1,0 +1,15 @@
+# HestiaCP production: panel owns nginx + MySQL + WordPress.
+# Docker runs ONLY the Next.js app on loopback; Hestia nginx proxies to it.
+# Usage: docker compose -f docker-compose.hestia.yml --env-file .env.prod up -d --build
+services:
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SITE_URL: https://www.shresthahotel.com
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000" # loopback only — never expose Node publicly
+    environment:
+      WORDPRESS_API_URL: https://www.shresthahotel.com/graphql
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET:?set in env}
