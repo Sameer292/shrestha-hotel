@@ -53,18 +53,6 @@ export default function RootLayout({
 					<Header bookingUrl={mockSettings.bookingUrl} />
 					<main className="flex-1">{children}</main>
 					<Footer />
-					{/* WhatsApp floating — only if configured */}
-					{mockSettings.whatsapp && (
-						<a
-							href={`https://wa.me/${mockSettings.whatsapp.replace(/[^0-9]/g, "")}`}
-							target="_blank"
-							rel="noopener noreferrer"
-							aria-label="Chat on WhatsApp"
-							className="fixed bottom-5 right-5 z-40 w-12 h-12 rounded-full bg-[#25D366] text-white grid place-items-center shadow-lg hover:scale-105 transition"
-						>
-							<span className="text-sm font-bold">WA</span>
-						</a>
-					)}
 				</SmoothScroll>
 				<script
 					type="application/ld+json"
