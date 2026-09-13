@@ -3,13 +3,16 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Lightbox from "@/components/common/Lightbox";
 import { mockGallery } from "@/lib/wordpress/mock";
-import type { GalleryItem, GalleryPage } from "@/lib/wordpress/types";
+import type {
+	GalleryItem,
+	GalleryPage as GalleryPageData,
+} from "@/lib/wordpress/types";
 
 export default function GalleryPage() {
 	const [cat, setCat] = useState("All");
 	const [idx, setIdx] = useState<number | null>(null);
 	const [items, setItems] = useState<GalleryItem[]>(mockGallery);
-	const [page, setPage] = useState<GalleryPage | null>(null);
+	const [page, setPage] = useState<GalleryPageData | null>(null);
 	useEffect(() => {
 		fetch("/api/gallery")
 			.then((r) => (r.ok ? r.json() : null))

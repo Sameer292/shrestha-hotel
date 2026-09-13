@@ -131,7 +131,7 @@ add_action('init', function () {
             'graphql_plural_name' => 'testimonials',
             'menu_icon' => 'dashicons-format-quote',
             'menu_position' => 42,
-            'supports' => ['title', 'editor', 'custom-fields'],
+            'supports' => ['title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'],
         ],
         'gallery_item' => [
             'label' => 'Gallery Items',
@@ -140,7 +140,7 @@ add_action('init', function () {
             'graphql_plural_name' => 'galleryItems',
             'menu_icon' => 'dashicons-format-gallery',
             'menu_position' => 43,
-            'supports' => ['title', 'thumbnail', 'custom-fields'],
+            'supports' => ['title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'],
         ],
         'faq' => [
             'label' => 'FAQs',

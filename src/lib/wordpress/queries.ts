@@ -139,7 +139,10 @@ function mapRoom(n: WPItemNode & { roomFields?: WPRoomFields | null }): Room {
 		excerpt: clean(n.excerpt) || name,
 		description: clean(n.content),
 		featuredImage: nodeImage(n),
-		gallery: wpImages(f?.gallery, name),
+		gallery: wpImages(
+			[f?.galleryimage1, f?.galleryimage2, f?.galleryimage3],
+			name,
+		),
 		startingPrice: f?.startingprice ?? undefined,
 		currency: f?.currency || "NPR",
 		capacity: f?.capacity ?? 2,
@@ -170,7 +173,7 @@ function mapExperience(
 		excerpt: clean(n.excerpt) || name,
 		description: clean(n.content),
 		featuredImage: nodeImage(n),
-		gallery: wpImages(f?.gallery, name),
+		gallery: [],
 		duration: f?.duration || undefined,
 		difficulty: f?.difficulty || undefined,
 		season: f?.season || undefined,
@@ -230,7 +233,8 @@ type WPPageFields = {
 	storyeyebrow?: string | null;
 	storyheading?: string | null;
 	storybody?: string | null;
-	storyimages?: { sourceUrl: string; altText: string }[] | null;
+	storyimage1?: WPImage | null;
+	storyimage2?: WPImage | null;
 	storystats?: string | null;
 	locationheading?: string | null;
 	locationtext?: string | null;
@@ -241,17 +245,18 @@ type WPPageFields = {
 	heroprimaryctaurl?: string | null;
 	herosecondarycta?: string | null;
 	herosecondaryctaurl?: string | null;
-	footerbackground?: { sourceUrl: string; altText: string }[] | null;
+	footerbackground?: WPImage | null;
 	footertagline?: string | null;
 	footersubtagline?: string | null;
 	finalctaheading?: string | null;
 	finalctadescription?: string | null;
-	finalctaimage?: { sourceUrl: string; altText: string }[] | null;
+	finalctaimage?: WPImage | null;
 	finalctaprimarycta?: string | null;
 	finalctaprimaryctaurl?: string | null;
 	finalctasecondarycta?: string | null;
 	finalctasecondaryctaurl?: string | null;
-	diningimages?: { sourceUrl: string; altText: string }[] | null;
+	diningimage1?: WPImage | null;
+	diningimage2?: WPImage | null;
 };
 
 type WPPageNode<F extends string> = {
@@ -273,6 +278,16 @@ function singleImage(
 	return img?.sourceUrl
 		? { url: wpMedia(img.sourceUrl), alt: img.altText || title }
 		: null;
+}
+
+function wpImages(
+	imgs: (WPImage | null | undefined)[] | null | undefined,
+	title: string,
+): { url: string; alt: string }[] {
+	if (!imgs) return [];
+	return imgs
+		.filter((i): i is WPImage => !!i?.sourceUrl)
+		.map((i) => ({ url: wpMedia(i.sourceUrl), alt: i.altText || title }));
 }
 
 function parseStatLines(raw: string | null | undefined): { value: string; label: string }[] {
@@ -326,7 +341,7 @@ const HOME_PAGE_FIELDS = `
 	homePageFields {
 		hotelname tagline subtagline
 		heroeyebrow heroprimarycta heroprimaryctaurl herosecondarycta herosecondaryctaurl
-		storyeyebrow storyheading storybody storyimages { sourceUrl altText } storystats
+		storyeyebrow storyheading storybody storyimage1 { sourceUrl altText } storyimage2 { sourceUrl altText } storystats
 		locationheading locationtext
 		footerbackground { sourceUrl altText } footertagline footersubtagline
 		finalctaheading finalctadescription finalctaimage { sourceUrl altText }
@@ -341,9 +356,13 @@ export async function getHomeEntry(): Promise<HomeEntry | null> {
 	const n = data?.homeContentPages?.nodes?.[0];
 	if (!n) return null;
 	const f = n.homePageFields;
-	const storyImages = wpImages(f?.storyimages, n.title);
-	const footerBg = wpImages(f?.footerbackground, n.title);
-	const finalImages = wpImages(f?.finalctaimage, n.title);
+	const storyImages = wpImages(
+		[f?.storyimage1, f?.storyimage2],
+		n.title,
+	);
+	const footerBg = singleImage(f?.footerbackground, n.title);
+	const finalImage =
+		singleImage(f?.finalctaimage, n.title) ?? placeholder(n.title);
 	return {
 		hotelName: f?.hotelname || n.title,
 		tagline: f?.tagline || "",
@@ -364,12 +383,12 @@ export async function getHomeEntry(): Promise<HomeEntry | null> {
 		storyStats: parseStatLines(f?.storystats),
 		locationHeading: f?.locationheading || "",
 		locationText: f?.locationtext || "",
-		footerBackground: footerBg[0],
+		footerBackground: footerBg ?? undefined,
 		footerTagline: f?.footertagline || f?.tagline || "",
 		footerSubtagline: f?.footersubtagline || f?.subtagline || "",
 		finalCtaHeading: f?.finalctaheading || "",
 		finalCtaDescription: f?.finalctadescription || "",
-		finalCtaImage: finalImages[0] ?? placeholder(n.title),
+		finalCtaImage: finalImage,
 		finalCtaPrimaryCta: f?.finalctaprimarycta || "Book Your Stay",
 		finalCtaPrimaryCtaUrl: f?.finalctaprimaryctaurl || "/booking",
 		finalCtaSecondaryCta: f?.finalctasecondarycta || "Contact Us",
@@ -473,7 +492,7 @@ const DINING_PAGE_FIELDS = `
 	slug title excerpt content
 	diningPageFields {
 		heroeyebrow heading subheading teaserheading teasertext
-		diningimages { sourceUrl altText } cta teaserctaurl
+		diningimage1 { sourceUrl altText } diningimage2 { sourceUrl altText } cta teaserctaurl
 	}
 `;
 
@@ -490,7 +509,7 @@ export async function getDiningPage(): Promise<DiningPage | null> {
 	const n = data?.diningPages?.nodes?.[0];
 	if (!n) return null;
 	const f = n.diningPageFields;
-	const images = wpImages(f?.diningimages, n.title);
+	const images = wpImages([f?.diningimage1, f?.diningimage2], n.title);
 	return {
 		eyebrow: f?.heroeyebrow || "Dining",
 		heading: f?.heading || "",
@@ -573,12 +592,14 @@ export async function getContactPage(): Promise<ContactPage | null> {
 const ROOM_FIELDS = `
 	slug title excerpt content
 	featuredImage { node { sourceUrl altText } }
-	roomFields {
-		startingprice currency capacity adults children
-		bedtype roomsize view amenities checkin checkout
-		gallery { sourceUrl altText }
-		featured displayorder
-	}
+		roomFields {
+			startingprice currency capacity adults children
+			bedtype roomsize view amenities checkin checkout
+			galleryimage1 { sourceUrl altText }
+			galleryimage2 { sourceUrl altText }
+			galleryimage3 { sourceUrl altText }
+			featured displayorder
+		}
 `;
 
 export async function getRooms(): Promise<Room[]> {
@@ -617,7 +638,6 @@ export async function getExperiences(): Promise<Experience[]> {
 					featuredImage { node { sourceUrl altText } }
 					experienceFields {
 						duration difficulty season optionalprice
-						gallery { sourceUrl altText }
 						featured
 					}
 				}
