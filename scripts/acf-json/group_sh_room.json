@@ -58,8 +58,9 @@
     {
       "key": "field_sh_room_amenities",
       "name": "amenities",
-      "label": "Amenities",
-      "type": "text"
+      "label": "Amenities (one per line)",
+      "type": "textarea",
+      "rows": 5
     },
     {
       "key": "field_sh_room_checkin",
@@ -87,18 +88,36 @@
       "type": "number"
     },
     {
-      "key": "field_sh_room_gallery",
-      "name": "gallery",
-      "label": "Gallery (detail page strip, max 3 shown)",
-      "type": "gallery",
-      "instructions": "Upload room photos. First 3 appear on the room detail page.",
+      "key": "field_sh_room_gallery1",
+      "name": "galleryImage1",
+      "label": "Extra photo 1 (detail page strip)",
+      "type": "image",
       "required": 0,
       "return_format": "array",
       "preview_size": "medium",
-      "insert": "append",
       "library": "all",
-      "min": 0,
-      "max": 0,
+      "mime_types": ""
+    },
+    {
+      "key": "field_sh_room_gallery2",
+      "name": "galleryImage2",
+      "label": "Extra photo 2 (detail page strip)",
+      "type": "image",
+      "required": 0,
+      "return_format": "array",
+      "preview_size": "medium",
+      "library": "all",
+      "mime_types": ""
+    },
+    {
+      "key": "field_sh_room_gallery3",
+      "name": "galleryImage3",
+      "label": "Extra photo 3 (detail page strip)",
+      "type": "image",
+      "required": 0,
+      "return_format": "array",
+      "preview_size": "medium",
+      "library": "all",
       "mime_types": ""
     }
   ],

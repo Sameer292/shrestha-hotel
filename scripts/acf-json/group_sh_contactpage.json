@@ -1,0 +1,20 @@
+{
+  "key": "group_sh_contactpage",
+  "title": "Contact Page",
+  "fields": [
+    {"key": "field_sh_cpg_eyebrow", "name": "heroEyebrow", "label": "Hero eyebrow", "type": "text"},
+    {"key": "field_sh_cpg_heading", "name": "heading", "label": "Page heading", "type": "textarea", "rows": 2},
+    {"key": "field_sh_cpg_subheading", "name": "subheading", "label": "Form intro paragraph", "type": "textarea", "rows": 3},
+    {"key": "field_sh_cpg_sidebarTitle", "name": "sidebarTitle", "label": "Form card title", "type": "text"}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "contact_page"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "seamless",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "contactPageFields"
+}

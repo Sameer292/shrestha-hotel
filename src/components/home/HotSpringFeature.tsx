@@ -2,19 +2,32 @@ import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+const DEFAULT_BULLETS = [
+	"Designed for relaxation and restoration",
+	"Indoor & open-air pools • guest access included",
+	"Quiet hours before 9AM — steam and silence",
+];
+
 export default function HotSpringFeature({
 	heading,
 	text,
 	image,
 	temperature,
 	hours,
+	cta,
+	ctaUrl,
+	bullets,
 }: {
 	heading: string;
 	text: string;
 	image: { url: string; alt: string };
 	temperature?: string;
 	hours?: string;
+	cta?: string;
+	ctaUrl?: string;
+	bullets?: string[];
 }) {
+	const shown = bullets?.length ? bullets : DEFAULT_BULLETS;
 	return (
 		<section className="py-6 md:py-10">
 			<div className="container-outer">
@@ -56,24 +69,17 @@ export default function HotSpringFeature({
 							{text}
 						</p>
 						<ul className="mt-6 space-y-2 text-sm text-white/70">
-							<li className="flex gap-2">
-								<span className="text-white/40">—</span> Designed for relaxation
-								and restoration
-							</li>
-							<li className="flex gap-2">
-								<span className="text-white/40">—</span> Indoor & open-air pools
-								• guest access included
-							</li>
-							<li className="flex gap-2">
-								<span className="text-white/40">—</span> Quiet hours before 9AM
-								— steam and silence
-							</li>
+							{shown.map((b) => (
+								<li key={b} className="flex gap-2">
+									<span className="text-white/40">—</span> {b}
+								</li>
+							))}
 						</ul>
 						<Link
-							href="/hot-spring"
+							href={ctaUrl || "/hot-spring"}
 							className="mt-8 inline-flex items-center gap-2 bg-[var(--forest)] text-white px-7 py-3 rounded-full text-sm font-medium w-fit hover:bg-[var(--forest-2)] transition"
 						>
-							Discover the Hot Spring <ArrowUpRight size={14} />
+							{cta || "Discover the Hot Spring"} <ArrowUpRight size={14} />
 						</Link>
 					</div>
 				</div>

@@ -1,10 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function BookingPage() {
 	const [status, setStatus] = useState<
 		"idle" | "loading" | "success" | "error"
 	>("idle");
+	const [rooms, setRooms] = useState<{ slug: string; name: string }[]>([]);
+	useEffect(() => {
+		fetch("/api/rooms")
+			.then((r) => (r.ok ? r.json() : null))
+			.then((d) => {
+				if (Array.isArray(d)) setRooms(d);
+			})
+			.catch(() => {});
+	}, []);
 	async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const fd = new FormData(e.currentTarget);
@@ -31,17 +40,12 @@ export default function BookingPage() {
 		<div className="pt-20">
 			<div className="container-outer pt-8 pb-6">
 				<p className="eyebrow text-[var(--moss)]">Booking</p>
-				<h1 className="display text-[40px] md:text-[52px] text-[var(--forest)] leading-none mt-2">
+				<h1 className="display text-[40px] md:text-[52px] text-[var(--forest)] leading-none mt-2 whitespace-pre-line">
 					Reserve your stay
 				</h1>
 				<p className="text-sm text-[var(--muted)] max-w-[56ch] mt-3 leading-relaxed">
-					This is a reservation inquiry — not a fake availability system. When
-					your PMS/booking engine is ready, set{" "}
-					<code className="bg-[var(--cream-2)] px-1.5 py-0.5 rounded text-xs">
-						Booking URL
-					</code>{" "}
-					in WordPress settings and the header CTA will open your engine. Until
-					then, inquiries come here.
+					Tell us your dates — we confirm availability personally, usually
+					within a few hours.
 				</p>
 			</div>
 			<div className="container-outer pb-16 max-w-[760px]">
@@ -97,10 +101,20 @@ export default function BookingPage() {
 								className="mt-1 w-full border border-[var(--line)] rounded-xl px-4 py-2.5 text-sm bg-white"
 							>
 								<option>Any room</option>
-								<option>Forest Retreat Suite</option>
-								<option>Hotspring Deluxe</option>
-								<option>Mountain Family Retreat</option>
-								<option>Riverside Calm</option>
+								{(rooms.length
+									? rooms
+									: [
+											{ slug: "forest-retreat-suite", name: "Forest Retreat Suite" },
+											{ slug: "hotspring-deluxe", name: "Hotspring Deluxe" },
+											{
+												slug: "mountain-family-retreat",
+												name: "Mountain Family Retreat",
+											},
+											{ slug: "riverside-calm", name: "Riverside Calm" },
+										]
+								).map((r) => (
+									<option key={r.slug}>{r.name}</option>
+								))}
 							</select>
 						</label>
 					</div>

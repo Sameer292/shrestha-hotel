@@ -67,6 +67,7 @@ export type FAQ = {
 export type HotelSettings = {
 	hotelName: string;
 	tagline: string;
+	subtagline: string;
 	phone: string;
 	secondaryPhone?: string;
 	email: string;
@@ -86,26 +87,111 @@ export type HotelSettings = {
 	footerDescription: string;
 };
 
-export type HomeContent = {
-	hero: {
-		eyebrow: string;
-		heading: string;
-		subheading: string;
-		image: Media;
-		primaryCta: string;
-		secondaryCta: string;
-	};
-	intro: { heading: string; body: string; images: Media[] };
-	hotSpring: {
-		heading: string;
-		text: string;
-		image: Media;
-		temperature?: string;
-		hours?: string;
-		cta: string;
-	};
-	dining: { heading: string; text: string; images: Media[]; cta: string };
-	finalCta: { heading: string; description: string; image: Media };
-	about: { heading: string; body: string; image: Media };
+// Home Content CPT entry (slug: home) — homepage + footer identity.
+export type HomeEntry = {
+	hotelName: string;
+	tagline: string;
+	subtagline: string;
+	heroEyebrow: string;
+	heroImage: Media;
+	heroPrimaryCta: string;
+	heroPrimaryCtaUrl: string;
+	heroSecondaryCta: string;
+	heroSecondaryCtaUrl: string;
+	storyEyebrow: string;
+	storyHeading: string;
+	storyBody: string;
+	storyImages: Media[];
+	storyStats: { value: string; label: string }[];
+	locationHeading: string;
+	locationText: string;
+	footerBackground?: Media;
+	footerTagline: string;
+	footerSubtagline: string;
+	finalCtaHeading: string;
+	finalCtaDescription: string;
+	finalCtaImage: Media;
+	finalCtaPrimaryCta: string;
+	finalCtaPrimaryCtaUrl: string;
+	finalCtaSecondaryCta: string;
+	finalCtaSecondaryCtaUrl: string;
+};
+
+// Per-page CPT entries. Lists (rooms, experiences, gallery…) always come
+// from their item CPTs; these hold each page's hero + sections.
+export type StayPage = {
+	eyebrow: string;
+	heading: string;
+	subheading: string;
+	sidebarText: string;
+	ctaLabel: string;
+	ctaUrl: string;
+	secondaryCtaLabel: string;
+	secondaryCtaUrl: string;
+};
+
+export type HotSpringPage = {
+	eyebrow: string;
+	heading: string;
+	subheading: string;
+	heroImage: Media;
+	teaserHeading: string;
+	teaserText: string;
+	temperature: string;
+	hours: string;
+	bullets: string[];
+	body: string;
+	cards: { title: string; text: string }[];
+	etiquette: string[];
+	sidebarTitle: string;
+	sidebarText: string;
+	ctaLabel: string;
+	ctaUrl: string;
+	teaserCta: string;
+	teaserCtaUrl: string;
+	faqCategory: string;
+};
+
+export type ExperiencesPage = {
+	eyebrow: string;
+	heading: string;
+	subheading: string;
+	sidebarTitle: string;
+	sidebarText: string;
+	ctaLabel: string;
+	ctaUrl: string;
+};
+
+export type DiningPage = {
+	eyebrow: string;
+	heading: string;
+	subheading: string;
+	teaserHeading: string;
+	teaserText: string;
+	images: Media[];
+	cards: { title: string; text: string }[];
+	teaserCta: string;
+	teaserCtaUrl: string;
+};
+
+export type GalleryPage = {
+	eyebrow: string;
+	heading: string;
+	subheading: string;
+};
+
+export type AboutPage = {
+	eyebrow: string;
+	heading: string;
+	body: string;
+	image: Media;
+	stats: { value: string; label: string }[];
+};
+
+export type ContactPage = {
+	eyebrow: string;
+	heading: string;
+	subheading: string;
+	sidebarTitle: string;
 };
 

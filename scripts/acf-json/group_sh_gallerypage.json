@@ -1,0 +1,19 @@
+{
+  "key": "group_sh_gallerypage",
+  "title": "Gallery Page",
+  "fields": [
+    {"key": "field_sh_gpg_eyebrow", "name": "heroEyebrow", "label": "Hero eyebrow", "type": "text"},
+    {"key": "field_sh_gpg_heading", "name": "heading", "label": "Page heading", "type": "textarea", "rows": 2},
+    {"key": "field_sh_gpg_subheading", "name": "subheading", "label": "Page intro paragraph", "type": "textarea", "rows": 3}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "gallery_page"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "seamless",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "galleryPageFields"
+}

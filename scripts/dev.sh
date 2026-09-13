@@ -36,7 +36,7 @@ echo "✓ GraphQL is up"
 if ! docker compose run --rm --user 33:33 wpcli --path=/var/www/html core is-installed >/dev/null 2>&1; then
 	echo "==> First run — bootstrapping WordPress (core + plugins + CPTs)..."
 	bash scripts/wp-setup.sh http://localhost:8080
-	echo "   Then seed demo content once: bash scripts/migrate-content.sh && bash scripts/set-room-meta.sh && bash scripts/set-all-meta.sh"
+	echo "   Then seed demo content once: bash scripts/seed-all-content.sh"
 fi
 
 LAN_IP=$(ip -4 route get 1.1.1.1 2>/dev/null | grep -oE "src [0-9.]+" | cut -d" " -f2)

@@ -3,18 +3,24 @@ import {
 	mockExperiences,
 	mockFaqs,
 	mockGallery,
-	mockHome,
 	mockRooms,
 	mockSettings,
 	mockTestimonials,
 } from "./mock";
 import type {
+	AboutPage,
+	ContactPage,
+	DiningPage,
 	Experience,
+	ExperiencesPage,
 	FAQ,
 	GalleryItem,
-	HomeContent,
+	GalleryPage,
+	HomeEntry,
+	HotSpringPage,
 	HotelSettings,
 	Room,
+	StayPage,
 	Testimonial,
 } from "./types";
 
@@ -45,138 +51,130 @@ async function withFallback<T>(
 	return mock;
 }
 
-// WPGraphQL shape with ACF fields (lowercase via WPGraphQL for ACF)
-type WPRoomNode = {
+// Item CPTs (room, experience, testimonial, gallery_item, faq) are native
+// WPGraphQL nodes — one post per item, ACF fields via WPGraphQL for ACF
+// (field names arrive lowercase), featured image = card/hero photo.
+type WPImage = { sourceUrl: string; altText: string };
+
+type WPItemNode = {
 	slug: string;
 	title: string;
 	excerpt: string;
 	content: string;
-	featuredImage?: { node?: { sourceUrl: string; altText: string } } | null;
-	roomFields?: {
-		startingprice?: number | null;
-		currency?: string | null;
-		capacity?: number | null;
-		adults?: number | null;
-		children?: number | null;
-		bedtype?: string | null;
-		roomsize?: string | null;
-		view?: string | null;
-		amenities?: string | null;
-		checkin?: string | null;
-		checkout?: string | null;
-		featured?: boolean | null;
-		displayorder?: number | null;
-		gallery?: { sourceUrl: string; altText: string }[] | null;
-	} | null;
-};
-type WPExpNode = {
-	slug: string;
-	title: string;
-	excerpt: string;
-	content: string;
-	featuredImage?: { node?: { sourceUrl: string; altText: string } } | null;
-	experienceFields?: {
-		duration?: string | null;
-		difficulty?: string | null;
-		season?: string | null;
-		featured?: boolean | null;
-	} | null;
-};
-type WPTermNode = {
-	title: string;
-	content: string;
-	excerpt: string;
-	testimonialFields?: {
-		guestname?: string | null;
-		guestlocation?: string | null;
-		quote?: string | null;
-		rating?: number | null;
-		featured?: boolean | null;
-	} | null;
-	faqFields?: {
-		question?: string | null;
-		answer?: string | null;
-		category?: string | null;
-		displayorder?: number | null;
-	} | null;
-	galleryItemFields?: {
-		category?: string | null;
-		caption?: string | null;
-		displayorder?: number | null;
-	} | null;
-	featuredImage?: { node?: { sourceUrl: string; altText: string } } | null;
+	featuredImage?: { node?: WPImage } | null;
 };
 
-const CURATED_FALLBACKS = {
-	room: [
-		"https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&h=800&q=80",
-		"https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&h=800&q=80",
-		"https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1200&h=800&q=80",
-		"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&h=800&q=80",
-	],
-	experience:
-		"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&h=600&q=80",
-	gallery:
-		"https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=800&h=800&q=80",
+type WPRoomFields = {
+	startingprice?: number | null;
+	currency?: string | null;
+	capacity?: number | null;
+	adults?: number | null;
+	children?: number | null;
+	bedtype?: string | null;
+	roomsize?: string | null;
+	view?: string | null;
+	amenities?: string | null;
+	checkin?: string | null;
+	checkout?: string | null;
+	galleryimage1?: WPImage | null;
+	galleryimage2?: WPImage | null;
+	galleryimage3?: WPImage | null;
+	featured?: boolean | null;
+	displayorder?: number | null;
 };
 
-function mapRoom(n: WPRoomNode, idx = 0): Room {
+type WPExperienceFields = {
+	duration?: string | null;
+	difficulty?: string | null;
+	season?: string | null;
+	optionalprice?: number | null;
+	featured?: boolean | null;
+};
+
+type WPTestimonialFields = {
+	guestname?: string | null;
+	guestlocation?: string | null;
+	quote?: string | null;
+	rating?: number | null;
+	featured?: boolean | null;
+};
+
+type WPGalleryItemFields = {
+	category?: string | null;
+	caption?: string | null;
+	displayorder?: number | null;
+};
+
+type WPFAQFields = {
+	question?: string | null;
+	answer?: string | null;
+	category?: string | null;
+	displayorder?: number | null;
+};
+
+// Local placeholder used whenever WordPress has no image for an entry.
+// Upload real photos as Featured image / gallery in WP Admin to replace it.
+export const PLACEHOLDER_IMAGE = "/placeholder.svg";
+
+function placeholder(title: string) {
+	return { url: PLACEHOLDER_IMAGE, alt: title };
+}
+
+function nodeImage(
+	n: WPItemNode,
+): { url: string; alt: string } {
+	const img = n.featuredImage?.node;
+	const title = clean(n.title);
+	return img?.sourceUrl
+		? { url: wpMedia(img.sourceUrl), alt: img.altText || title }
+		: placeholder(title);
+}
+
+function mapRoom(n: WPItemNode & { roomFields?: WPRoomFields | null }): Room {
 	const f = n.roomFields;
+	const name = clean(n.title);
 	return {
 		slug: n.slug,
-		name: n.title,
-		excerpt: n.excerpt?.replace(/<[^>]*>/g, "").trim() || n.title,
-		description: n.content?.replace(/<[^>]*>/g, "").trim() || n.excerpt || "",
-		featuredImage: n.featuredImage?.node
-			? {
-					url: wpMedia(n.featuredImage.node.sourceUrl),
-					alt: n.featuredImage.node.altText || n.title,
-				}
-			: {
-					url: CURATED_FALLBACKS.room[idx % CURATED_FALLBACKS.room.length],
-					alt: n.title,
-				},
-		gallery: (f?.gallery ?? [])
-			.filter((g) => g?.sourceUrl)
-			.map((g) => ({ url: wpMedia(g.sourceUrl), alt: g.altText || n.title })),
+		name,
+		excerpt: clean(n.excerpt) || name,
+		description: clean(n.content),
+		featuredImage: nodeImage(n),
+		gallery: wpImages(f?.gallery, name),
 		startingPrice: f?.startingprice ?? undefined,
-		currency: f?.currency ?? "NPR",
+		currency: f?.currency || "NPR",
 		capacity: f?.capacity ?? 2,
 		adults: f?.adults ?? 2,
 		children: f?.children ?? 0,
-		bedType: f?.bedtype ?? "—",
-		roomSize: f?.roomsize ?? "—",
-		view: f?.view ?? "—",
-		amenities: f?.amenities
-			? f.amenities.split(",").map((a) => a.trim())
-			: [],
-		checkIn: f?.checkin ?? "2:00 PM",
-		checkOut: f?.checkout ?? "11:00 AM",
+		bedType: f?.bedtype || "—",
+		roomSize: f?.roomsize || "—",
+		view: f?.view || "—",
+		amenities: (f?.amenities ?? "")
+			.split(/[\r\n,]+/)
+			.map((a) => a.trim())
+			.filter(Boolean),
+		checkIn: f?.checkin || "2:00 PM",
+		checkOut: f?.checkout || "11:00 AM",
 		featured: f?.featured ?? false,
-		displayOrder: f?.displayorder ?? idx,
+		displayOrder: f?.displayorder ?? 0,
 	};
 }
 
-function mapExperience(n: WPExpNode): Experience {
+function mapExperience(
+	n: WPItemNode & { experienceFields?: WPExperienceFields | null },
+): Experience {
 	const f = n.experienceFields;
+	const name = clean(n.title);
 	return {
 		slug: n.slug,
-		name: n.title,
-		excerpt: n.excerpt?.replace(/<[^>]*>/g, "").trim() || n.title,
-		description: n.content?.replace(/<[^>]*>/g, "").trim() || "",
-		featuredImage: n.featuredImage?.node
-			? {
-					url: wpMedia(n.featuredImage.node.sourceUrl),
-					alt: n.featuredImage.node.altText || n.title,
-				}
-			: {
-					url: CURATED_FALLBACKS.experience,
-					alt: n.title,
-				},
-		gallery: [],
-		duration: f?.duration ?? undefined,
-		difficulty: f?.difficulty ?? undefined,
-		season: f?.season ?? undefined,
+		name,
+		excerpt: clean(n.excerpt) || name,
+		description: clean(n.content),
+		featuredImage: nodeImage(n),
+		gallery: wpImages(f?.gallery, name),
+		duration: f?.duration || undefined,
+		difficulty: f?.difficulty || undefined,
+		season: f?.season || undefined,
+		price: f?.optionalprice ?? undefined,
 		featured: f?.featured ?? false,
 	};
 }
@@ -186,13 +184,11 @@ function mapExperience(n: WPExpNode): Experience {
 // ============================================
 
 const SETTINGS_FIELDS = `
-	hotelName tagline phone secondaryPhone email whatsapp address
+	hotelName tagline subtagline phone secondaryPhone email whatsapp address
 	googleMapsUrl googleMapsEmbed latitude longitude
 	instagram facebook tripadvisor bookingUrl
 	checkIn checkOut currency footerDescription
 `;
-const MEDIA_FIELDS = `image { url alt }`;
-const MEDIA_LIST = `images { url alt }`;
 
 export async function getHotelSettings(): Promise<HotelSettings> {
 	const data = await wpFetch<{ hotelSettings: HotelSettings | null }>(
@@ -205,53 +201,397 @@ export async function getHotelSettings(): Promise<HotelSettings> {
 	);
 }
 
-export async function getHomeContent(): Promise<HomeContent> {
-	const data = await wpFetch<{ homeContent: HomeContent | null }>(
-		`query { homeContent {
-			hero { eyebrow heading subheading ${MEDIA_FIELDS} primaryCta secondaryCta }
-			intro { heading body ${MEDIA_LIST} }
-			hotSpring { heading text ${MEDIA_FIELDS} temperature hours cta }
-			dining { heading text ${MEDIA_LIST} cta }
-			finalCta { heading description ${MEDIA_FIELDS} }
-			about { heading body ${MEDIA_FIELDS} }
-		} }`,
-	);
-	const home = data?.homeContent ?? null;
-	if (home) {
-		const fix = (m: { url: string; alt: string }) => ({
-			...m,
-			url: wpMedia(m.url),
-		});
-		home.hero.image = fix(home.hero.image);
-		home.intro.images = home.intro.images.map(fix);
-		home.hotSpring.image = fix(home.hotSpring.image);
-		home.dining.images = home.dining.images.map(fix);
-		home.finalCta.image = fix(home.finalCta.image);
-		home.about.image = fix(home.about.image);
-	}
-	return withFallback(home, mockHome, "getHomeContent");
+// ---------- Page CPTs (one entry per frontend page) ----------
+// ACF text field names arrive lowercase via WPGraphQL for ACF.
+type WPPageFields = {
+	heroeyebrow?: string | null;
+	heading?: string | null;
+	subheading?: string | null;
+	body?: string | null;
+	stats?: string | null;
+	cards?: string | null;
+	etiquette?: string | null;
+	bullets?: string | null;
+	sidebartitle?: string | null;
+	sidebartext?: string | null;
+	ctalabel?: string | null;
+	ctaurl?: string | null;
+	secondaryctalabel?: string | null;
+	secondaryctaurl?: string | null;
+	faqcategory?: string | null;
+	note?: string | null;
+	temperature?: string | null;
+	hours?: string | null;
+	cta?: string | null;
+	teaserheading?: string | null;
+	teasertext?: string | null;
+	teaserctaurl?: string | null;
+	images?: { sourceUrl: string; altText: string }[] | null;
+	storyeyebrow?: string | null;
+	storyheading?: string | null;
+	storybody?: string | null;
+	storyimages?: { sourceUrl: string; altText: string }[] | null;
+	storystats?: string | null;
+	locationheading?: string | null;
+	locationtext?: string | null;
+	hotelname?: string | null;
+	tagline?: string | null;
+	subtagline?: string | null;
+	heroprimarycta?: string | null;
+	heroprimaryctaurl?: string | null;
+	herosecondarycta?: string | null;
+	herosecondaryctaurl?: string | null;
+	footerbackground?: { sourceUrl: string; altText: string }[] | null;
+	footertagline?: string | null;
+	footersubtagline?: string | null;
+	finalctaheading?: string | null;
+	finalctadescription?: string | null;
+	finalctaimage?: { sourceUrl: string; altText: string }[] | null;
+	finalctaprimarycta?: string | null;
+	finalctaprimaryctaurl?: string | null;
+	finalctasecondarycta?: string | null;
+	finalctasecondaryctaurl?: string | null;
+	diningimages?: { sourceUrl: string; altText: string }[] | null;
+};
+
+type WPPageNode<F extends string> = {
+	slug: string;
+	title: string;
+	excerpt: string;
+	content: string;
+	featuredImage?: { node?: { sourceUrl: string; altText: string } } | null;
+} & { [K in F]?: WPPageFields | null };
+
+function clean(s: string | null | undefined): string {
+	return s?.replace(/<[^>]*>/g, "").trim() ?? "";
 }
 
-export async function getRooms(): Promise<Room[]> {
-	const data = await wpFetch<{ rooms: { nodes: WPRoomNode[] } }>(
-		`query {
-			rooms {
-				nodes {
-					slug title excerpt content
-					featuredImage { node { sourceUrl altText } }
-					roomFields {
-						startingprice currency capacity adults children
-						bedtype roomsize view amenities
-						checkin checkout featured displayorder
-						gallery { sourceUrl altText }
-					}
-				}
+function singleImage(
+	img: WPImage | null | undefined,
+	title: string,
+): { url: string; alt: string } | null {
+	return img?.sourceUrl
+		? { url: wpMedia(img.sourceUrl), alt: img.altText || title }
+		: null;
+}
+
+function parseStatLines(raw: string | null | undefined): { value: string; label: string }[] {
+	if (!raw) return [];
+	return raw
+		.split(/\r?\n/)
+		.map((l) => l.trim())
+		.filter(Boolean)
+		.map((l) => {
+			const [value, ...rest] = l.split("|");
+			return { value: value.trim(), label: rest.join("|").trim() };
+		})
+		.filter((s) => s.value || s.label);
+}
+
+function parseCardLines(raw: string | null | undefined): { title: string; text: string }[] {
+	if (!raw) return [];
+	return raw
+		.split(/\r?\n/)
+		.map((l) => l.trim())
+		.filter(Boolean)
+		.map((l) => {
+			const [title, ...rest] = l.split("|");
+			return { title: title.trim(), text: rest.join("|").trim() };
+		})
+		.filter((c) => c.title || c.text);
+}
+
+function parseLineList(raw: string | null | undefined): string[] {
+	if (!raw) return [];
+	return raw
+		.split(/\r?\n/)
+		.map((l) => l.trim())
+		.filter(Boolean);
+}
+
+function pageImage(
+	n: { title: string; featuredImage?: { node?: { sourceUrl: string; altText: string } } | null },
+): { url: string; alt: string } {
+	return n.featuredImage?.node
+		? {
+				url: wpMedia(n.featuredImage.node.sourceUrl),
+				alt: n.featuredImage.node.altText || n.title,
 			}
-		}`,
+		: placeholder(n.title);
+}
+
+const HOME_PAGE_FIELDS = `
+	slug title excerpt content
+	featuredImage { node { sourceUrl altText } }
+	homePageFields {
+		hotelname tagline subtagline
+		heroeyebrow heroprimarycta heroprimaryctaurl herosecondarycta herosecondaryctaurl
+		storyeyebrow storyheading storybody storyimages { sourceUrl altText } storystats
+		locationheading locationtext
+		footerbackground { sourceUrl altText } footertagline footersubtagline
+		finalctaheading finalctadescription finalctaimage { sourceUrl altText }
+		finalctaprimarycta finalctaprimaryctaurl finalctasecondarycta finalctasecondaryctaurl
+	}
+`;
+
+export async function getHomeEntry(): Promise<HomeEntry | null> {
+	const data = await wpFetch<{
+		homeContentPages: { nodes: WPPageNode<"homePageFields">[] };
+	}>(`query { homeContentPages(first: 1) { nodes { ${HOME_PAGE_FIELDS} } } }`);
+	const n = data?.homeContentPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.homePageFields;
+	const storyImages = wpImages(f?.storyimages, n.title);
+	const footerBg = wpImages(f?.footerbackground, n.title);
+	const finalImages = wpImages(f?.finalctaimage, n.title);
+	return {
+		hotelName: f?.hotelname || n.title,
+		tagline: f?.tagline || "",
+		subtagline: f?.subtagline || clean(n.excerpt),
+		heroEyebrow: f?.heroeyebrow || "",
+		heroImage: pageImage(n),
+		heroPrimaryCta: f?.heroprimarycta || "Book Your Stay",
+		heroPrimaryCtaUrl: f?.heroprimaryctaurl || "/booking",
+		heroSecondaryCta: f?.herosecondarycta || "Explore the Hotel",
+		heroSecondaryCtaUrl: f?.herosecondaryctaurl || "/stay",
+		storyEyebrow: f?.storyeyebrow || "Our Story",
+		storyHeading: f?.storyheading || "",
+		storyBody: f?.storybody || clean(n.content),
+		storyImages:
+			storyImages.length >= 2
+				? storyImages
+				: [...storyImages, ...Array(2 - storyImages.length).fill(placeholder(n.title))],
+		storyStats: parseStatLines(f?.storystats),
+		locationHeading: f?.locationheading || "",
+		locationText: f?.locationtext || "",
+		footerBackground: footerBg[0],
+		footerTagline: f?.footertagline || f?.tagline || "",
+		footerSubtagline: f?.footersubtagline || f?.subtagline || "",
+		finalCtaHeading: f?.finalctaheading || "",
+		finalCtaDescription: f?.finalctadescription || "",
+		finalCtaImage: finalImages[0] ?? placeholder(n.title),
+		finalCtaPrimaryCta: f?.finalctaprimarycta || "Book Your Stay",
+		finalCtaPrimaryCtaUrl: f?.finalctaprimaryctaurl || "/booking",
+		finalCtaSecondaryCta: f?.finalctasecondarycta || "Contact Us",
+		finalCtaSecondaryCtaUrl: f?.finalctasecondaryctaurl || "/contact",
+	};
+}
+
+const STAY_PAGE_FIELDS = `
+	slug title excerpt content
+	stayPageFields {
+		heroeyebrow heading subheading
+		sidebartext ctalabel ctaurl secondaryctalabel secondaryctaurl
+	}
+`;
+
+export async function getStayPage(): Promise<StayPage | null> {
+	const data = await wpFetch<{
+		stayPages: { nodes: WPPageNode<"stayPageFields">[] };
+	}>(`query { stayPages(first: 1) { nodes { ${STAY_PAGE_FIELDS} } } }`);
+	const n = data?.stayPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.stayPageFields;
+	return {
+		eyebrow: f?.heroeyebrow || "Stay",
+		heading: f?.heading || "",
+		subheading: f?.subheading || clean(n.content) || clean(n.excerpt),
+		sidebarText: f?.sidebartext || "",
+		ctaLabel: f?.ctalabel || "Check Availability",
+		ctaUrl: f?.ctaurl || "/booking",
+		secondaryCtaLabel: f?.secondaryctalabel || "Ask a Question",
+		secondaryCtaUrl: f?.secondaryctaurl || "/contact",
+	};
+}
+
+const HOT_SPRING_PAGE_FIELDS = `
+	slug title excerpt content
+	featuredImage { node { sourceUrl altText } }
+	hotSpringPageFields {
+		heroeyebrow heading subheading teaserheading teasertext
+		temperature hours bullets body cards etiquette
+		sidebartitle sidebartext ctalabel ctaurl cta teaserctaurl faqcategory
+	}
+`;
+
+export async function getHotSpringPage(): Promise<HotSpringPage | null> {
+	const data = await wpFetch<{
+		hotSpringPages: { nodes: WPPageNode<"hotSpringPageFields">[] };
+	}>(`query { hotSpringPages(first: 1) { nodes { ${HOT_SPRING_PAGE_FIELDS} } } }`);
+	const n = data?.hotSpringPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.hotSpringPageFields;
+	return {
+		eyebrow: f?.heroeyebrow || "Hot Spring",
+		heading: f?.heading || "",
+		subheading: f?.subheading || clean(n.content),
+		heroImage: pageImage(n),
+		teaserHeading: f?.teaserheading || "",
+		teaserText: f?.teasertext || clean(n.excerpt),
+		temperature: f?.temperature || "",
+		hours: f?.hours || "",
+		bullets: parseLineList(f?.bullets),
+		body: f?.body || "",
+		cards: parseCardLines(f?.cards),
+		etiquette: parseLineList(f?.etiquette),
+		sidebarTitle: f?.sidebartitle || "",
+		sidebarText: f?.sidebartext || "",
+		ctaLabel: f?.ctalabel || "",
+		ctaUrl: f?.ctaurl || "/booking",
+		teaserCta: f?.cta || "",
+		teaserCtaUrl: f?.teaserctaurl || "/hot-spring",
+		faqCategory: f?.faqcategory || "Hot Spring",
+	};
+}
+
+const EXPERIENCES_PAGE_FIELDS = `
+	slug title excerpt content
+	experiencesPageFields {
+		heroeyebrow heading subheading sidebartitle sidebartext ctalabel ctaurl
+	}
+`;
+
+export async function getExperiencesPage(): Promise<ExperiencesPage | null> {
+	const data = await wpFetch<{
+		experiencesPages: { nodes: WPPageNode<"experiencesPageFields">[] };
+	}>(`query { experiencesPages(first: 1) { nodes { ${EXPERIENCES_PAGE_FIELDS} } } }`);
+	const n = data?.experiencesPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.experiencesPageFields;
+	return {
+		eyebrow: f?.heroeyebrow || "Experiences",
+		heading: f?.heading || "",
+		subheading: f?.subheading || clean(n.content),
+		sidebarTitle: f?.sidebartitle || "",
+		sidebarText: f?.sidebartext || "",
+		ctaLabel: f?.ctalabel || "Enquire to Book",
+		ctaUrl: f?.ctaurl || "/booking",
+	};
+}
+
+const DINING_PAGE_FIELDS = `
+	slug title excerpt content
+	diningPageFields {
+		heroeyebrow heading subheading teaserheading teasertext
+		diningimages { sourceUrl altText } cta teaserctaurl
+	}
+`;
+
+export async function getDiningPage(): Promise<DiningPage | null> {
+	const data = await wpFetch<{
+		diningPages: {
+			nodes: (WPPageNode<"diningPageFields"> & {
+				mealsList: { title: string; text: string }[];
+			})[];
+		};
+	}>(
+		`query { diningPages(first: 1) { nodes { ${DINING_PAGE_FIELDS} mealsList { title text } } } }`,
 	);
-	if (!data) return withFallback(null, mockRooms, "getRooms");
-	if (!data.rooms?.nodes || data.rooms.nodes.length === 0) return [];
-	return data.rooms.nodes.map((n, i) => mapRoom(n, i));
+	const n = data?.diningPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.diningPageFields;
+	const images = wpImages(f?.diningimages, n.title);
+	return {
+		eyebrow: f?.heroeyebrow || "Dining",
+		heading: f?.heading || "",
+		subheading: f?.subheading || clean(n.content),
+		teaserHeading: f?.teaserheading || f?.heading || "",
+		teaserText: f?.teasertext || clean(n.excerpt),
+		images:
+			images.length >= 2
+				? images
+				: [...images, ...Array(2 - images.length).fill(placeholder(n.title))],
+		cards: (n.mealsList ?? [])
+			.map((m) => ({ title: m.title, text: m.text }))
+			.filter((c) => c.title || c.text),
+		teaserCta: f?.cta || "Explore Dining",
+		teaserCtaUrl: f?.teaserctaurl || "/dining",
+	};
+}
+
+const GALLERY_PAGE_FIELDS = `
+	slug title excerpt content
+	galleryPageFields { heroeyebrow heading subheading }
+`;
+
+export async function getGalleryPage(): Promise<GalleryPage | null> {
+	const data = await wpFetch<{
+		galleryPages: { nodes: WPPageNode<"galleryPageFields">[] };
+	}>(`query { galleryPages(first: 1) { nodes { ${GALLERY_PAGE_FIELDS} } } }`);
+	const n = data?.galleryPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.galleryPageFields;
+	return {
+		eyebrow: f?.heroeyebrow || "Gallery",
+		heading: f?.heading || "",
+		subheading: f?.subheading || "",
+	};
+}
+
+const ABOUT_PAGE_FIELDS = `
+	slug title excerpt content
+	featuredImage { node { sourceUrl altText } }
+	aboutPageFields { heroeyebrow heading stats }
+`;
+
+export async function getAboutPage(): Promise<AboutPage | null> {
+	const data = await wpFetch<{
+		aboutPages: { nodes: WPPageNode<"aboutPageFields">[] };
+	}>(`query { aboutPages(first: 1) { nodes { ${ABOUT_PAGE_FIELDS} } } }`);
+	const n = data?.aboutPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.aboutPageFields;
+	return {
+		eyebrow: f?.heroeyebrow || "About",
+		heading: f?.heading || n.title,
+		body: clean(n.content),
+		image: pageImage(n),
+		stats: parseStatLines(f?.stats),
+	};
+}
+
+const CONTACT_PAGE_FIELDS = `
+	slug title excerpt content
+	contactPageFields { heroeyebrow heading subheading sidebartitle }
+`;
+
+export async function getContactPage(): Promise<ContactPage | null> {
+	const data = await wpFetch<{
+		contactPages: { nodes: WPPageNode<"contactPageFields">[] };
+	}>(`query { contactPages(first: 1) { nodes { ${CONTACT_PAGE_FIELDS} } } }`);
+	const n = data?.contactPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.contactPageFields;
+	return {
+		eyebrow: f?.heroeyebrow || "Contact",
+		heading: f?.heading || n.title,
+		subheading: f?.subheading || "",
+		sidebarTitle: f?.sidebartitle || "Send a message",
+	};
+}
+
+const ROOM_FIELDS = `
+	slug title excerpt content
+	featuredImage { node { sourceUrl altText } }
+	roomFields {
+		startingprice currency capacity adults children
+		bedtype roomsize view amenities checkin checkout
+		gallery { sourceUrl altText }
+		featured displayorder
+	}
+`;
+
+export async function getRooms(): Promise<Room[]> {
+	const data = await wpFetch<{
+		rooms: { nodes: (WPItemNode & { roomFields?: WPRoomFields | null })[] };
+	}>(`query { rooms(first: 100, where: { status: PUBLISH }) { nodes { ${ROOM_FIELDS} } } }`);
+	const nodes = data?.rooms?.nodes;
+	if (!nodes) return withFallback(null, mockRooms, "getRooms");
+	if (nodes.length === 0) return [];
+	return nodes
+		.filter((n) => n.slug && n.title)
+		.map(mapRoom)
+		.sort((a, b) => a.displayOrder - b.displayOrder);
 }
 
 export async function getFeaturedRooms(): Promise<Room[]> {
@@ -265,23 +605,29 @@ export async function getRoomBySlug(slug: string): Promise<Room | null> {
 }
 
 export async function getExperiences(): Promise<Experience[]> {
-	const data = await wpFetch<{ experiences: { nodes: WPExpNode[] } }>(
+	const data = await wpFetch<{
+		experiences: {
+			nodes: (WPItemNode & { experienceFields?: WPExperienceFields | null })[];
+		};
+	}>(
 		`query {
-			experiences {
+			experiences(first: 100, where: { status: PUBLISH }) {
 				nodes {
 					slug title excerpt content
 					featuredImage { node { sourceUrl altText } }
 					experienceFields {
-						duration difficulty season featured
+						duration difficulty season optionalprice
+						gallery { sourceUrl altText }
+						featured
 					}
 				}
 			}
 		}`,
 	);
-	if (!data) return withFallback(null, mockExperiences, "getExperiences");
-	if (!data.experiences?.nodes || data.experiences.nodes.length === 0)
-		return [];
-	return data.experiences.nodes.map((n) => mapExperience(n));
+	const nodes = data?.experiences?.nodes;
+	if (!nodes) return withFallback(null, mockExperiences, "getExperiences");
+	if (nodes.length === 0) return [];
+	return nodes.filter((n) => n.slug && n.title).map(mapExperience);
 }
 
 export async function getExperienceBySlug(
@@ -292,11 +638,15 @@ export async function getExperienceBySlug(
 }
 
 export async function getTestimonials(): Promise<Testimonial[]> {
-	const data = await wpFetch<{ testimonials: { nodes: WPTermNode[] } }>(
+	const data = await wpFetch<{
+		testimonials: {
+			nodes: (WPItemNode & { testimonialFields?: WPTestimonialFields | null })[];
+		};
+	}>(
 		`query {
-			testimonials {
+			testimonials(first: 100, where: { status: PUBLISH }) {
 				nodes {
-					title content
+					slug title excerpt content
 					testimonialFields {
 						guestname guestlocation quote rating featured
 					}
@@ -304,82 +654,83 @@ export async function getTestimonials(): Promise<Testimonial[]> {
 			}
 		}`,
 	);
-	if (!data) return withFallback(null, mockTestimonials, "getTestimonials");
-	if (!data.testimonials?.nodes || data.testimonials.nodes.length === 0)
-		return [];
-	return data.testimonials.nodes.map((n) => {
-		const f = n.testimonialFields;
-		const contentText =
-			n.content?.replace(/<[^>]*>/g, "").trim() || n.excerpt || "";
-		return {
-			guestName: n.title || f?.guestname || "",
-			guestLocation: f?.guestlocation ?? "",
-			quote: contentText || f?.quote || "",
-			rating: f?.rating ?? undefined,
-			featured: f?.featured ?? false,
-		};
-	});
+	const nodes = data?.testimonials?.nodes;
+	if (!nodes) return withFallback(null, mockTestimonials, "getTestimonials");
+	if (nodes.length === 0) return [];
+	return nodes
+		.map((n) => {
+			const f = n.testimonialFields;
+			const name = f?.guestname || clean(n.title);
+			return {
+				guestName: name,
+				guestLocation: f?.guestlocation || "",
+				quote: f?.quote || clean(n.content) || clean(n.excerpt),
+				rating: f?.rating ?? 5,
+				featured: f?.featured ?? true,
+			};
+		})
+		.filter((r) => r.guestName && r.quote);
 }
 
 export async function getGallery(): Promise<GalleryItem[]> {
 	const data = await wpFetch<{
-		galleryItems: { nodes: WPTermNode[] };
+		galleryItems: {
+			nodes: (WPItemNode & { galleryItemFields?: WPGalleryItemFields | null })[];
+		};
 	}>(
 		`query {
-			galleryItems {
+			galleryItems(first: 200, where: { status: PUBLISH }) {
 				nodes {
-					title
+					slug title excerpt content
 					featuredImage { node { sourceUrl altText } }
-					galleryItemFields {
-						category caption displayorder
-					}
+					galleryItemFields { category caption displayorder }
 				}
 			}
 		}`,
 	);
-	if (!data) return withFallback(null, mockGallery, "getGallery");
-	if (!data.galleryItems?.nodes || data.galleryItems.nodes.length === 0)
-		return [];
-	return data.galleryItems.nodes.map((n, i) => {
-		const f = n.galleryItemFields;
-		return {
-			image: n.featuredImage?.node
-				? {
-						url: wpMedia(n.featuredImage.node.sourceUrl),
-						alt: n.featuredImage.node.altText || n.title,
-					}
-				: { url: CURATED_FALLBACKS.gallery, alt: n.title },
-			category: f?.category ?? "Hotel",
-			caption: f?.caption ?? n.title,
-			displayOrder: f?.displayorder ?? i,
-		};
-	});
+	const nodes = data?.galleryItems?.nodes;
+	if (!nodes) return withFallback(null, mockGallery, "getGallery");
+	if (nodes.length === 0) return [];
+	return nodes
+		.map((n, i) => {
+			const f = n.galleryItemFields;
+			const title = clean(n.title);
+			return {
+				image: nodeImage(n),
+				category: f?.category || "Hotel",
+				caption: f?.caption || title,
+				displayOrder: f?.displayorder ?? i,
+			};
+		})
+		.sort((a, b) => a.displayOrder - b.displayOrder);
 }
 
 export async function getFaqs(): Promise<FAQ[]> {
-	const data = await wpFetch<{ faqs: { nodes: WPTermNode[] } }>(
+	const data = await wpFetch<{
+		faqs: { nodes: (WPItemNode & { faqFields?: WPFAQFields | null })[] };
+	}>(
 		`query {
-			faqs {
+			faqs(first: 200, where: { status: PUBLISH }) {
 				nodes {
-					title content
-					faqFields {
-						question answer category displayorder
-					}
+					slug title excerpt content
+					faqFields { question answer category displayorder }
 				}
 			}
 		}`,
 	);
-	if (!data) return withFallback(null, mockFaqs, "getFaqs");
-	if (!data.faqs?.nodes || data.faqs.nodes.length === 0) return [];
-	return data.faqs.nodes.map((n, i) => {
-		const f = n.faqFields;
-		const contentText =
-			n.content?.replace(/<[^>]*>/g, "").trim() || "";
-		return {
-			question: n.title || f?.question || "",
-			answer: contentText || f?.answer || "",
-			category: f?.category ?? "General",
-			displayOrder: f?.displayorder ?? i,
-		};
-	});
+	const nodes = data?.faqs?.nodes;
+	if (!nodes) return withFallback(null, mockFaqs, "getFaqs");
+	if (nodes.length === 0) return [];
+	return nodes
+		.map((n, i) => {
+			const f = n.faqFields;
+			return {
+				question: f?.question || clean(n.title),
+				answer: f?.answer || clean(n.content),
+				category: f?.category || "General",
+				displayOrder: f?.displayorder ?? i,
+			};
+		})
+		.filter((r) => r.question && r.answer)
+		.sort((a, b) => a.displayOrder - b.displayOrder);
 }

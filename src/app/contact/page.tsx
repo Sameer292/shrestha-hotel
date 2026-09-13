@@ -1,19 +1,23 @@
-import { mockSettings } from "@/lib/wordpress/mock";
+import { getContactPage, getHotelSettings } from "@/lib/wordpress/queries";
 import ContactForm from "./ContactForm";
 
 export const metadata = { title: "Contact — Get in Touch" };
+export const revalidate = 10;
 
-export default function ContactPage() {
-	const s = mockSettings;
+export default async function ContactPage() {
+	const [s, page] = await Promise.all([
+		getHotelSettings(),
+		getContactPage(),
+	]);
 	return (
 		<div className="pt-20">
 			<div className="container-outer pt-8 pb-10 grid lg:grid-cols-12 gap-10">
 				<div className="lg:col-span-5">
-					<p className="eyebrow text-[var(--moss)]">Contact</p>
-					<h1 className="display text-[40px] md:text-[48px] text-[var(--forest)] leading-none mt-2">
-						We’re here to help
-						<br />
-						you arrive
+					<p className="eyebrow text-[var(--moss)]">
+						{page?.eyebrow || "Contact"}
+					</p>
+					<h1 className="display text-[40px] md:text-[48px] text-[var(--forest)] leading-none mt-2 whitespace-pre-line">
+						{page?.heading || "We’re here to help\nyou arrive"}
 					</h1>
 					<div className="mt-6 space-y-3 text-sm">
 						<p>
@@ -69,11 +73,11 @@ export default function ContactPage() {
 				<div className="lg:col-span-7">
 					<div className="bg-white border border-[var(--line)] rounded-[20px] p-6 md:p-8">
 						<h2 className="font-display text-xl text-[var(--forest)]">
-							Send a message
+							{page?.sidebarTitle || "Send a message"}
 						</h2>
 						<p className="text-sm text-[var(--muted)] mt-2">
-							We reply within a few hours. For urgent requests, call or
-							WhatsApp.
+							{page?.subheading ||
+								"We reply within a few hours. For urgent requests, call or WhatsApp."}
 						</p>
 						<ContactForm />
 					</div>

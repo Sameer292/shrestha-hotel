@@ -1,0 +1,31 @@
+{
+  "key": "group_sh_diningpage",
+  "title": "Dining Page",
+  "fields": [
+    {"key": "field_sh_dpg_eyebrow", "name": "heroEyebrow", "label": "Hero eyebrow", "type": "text"},
+    {"key": "field_sh_dpg_heading", "name": "heading", "label": "Page heading", "type": "textarea", "rows": 2},
+    {"key": "field_sh_dpg_subheading", "name": "subheading", "label": "Page intro paragraph", "type": "textarea", "rows": 4},
+    {"key": "field_sh_dpg_teaserHeading", "name": "teaserHeading", "label": "Homepage teaser heading", "type": "textarea", "rows": 2},
+    {"key": "field_sh_dpg_teaserText", "name": "teaserText", "label": "Homepage teaser text", "type": "textarea", "rows": 4},
+    {"key": "field_sh_dpg_image1", "name": "diningImage1", "label": "Page photo 1", "type": "image", "required": 0, "return_format": "array", "preview_size": "medium", "library": "all", "mime_types": ""},
+    {"key": "field_sh_dpg_image2", "name": "diningImage2", "label": "Page photo 2", "type": "image", "required": 0, "return_format": "array", "preview_size": "medium", "library": "all", "mime_types": ""},
+    {"key": "field_sh_dpg_cta", "name": "cta", "label": "Homepage teaser button", "type": "text"},
+    {"key": "field_sh_dpg_ctaUrl", "name": "teaserCtaUrl", "label": "Homepage teaser button URL", "type": "text"},
+    {"key": "field_sh_dpg_meal1Title", "name": "meal1Title", "label": "Meal card 1 title", "type": "text"},
+    {"key": "field_sh_dpg_meal1Text", "name": "meal1Text", "label": "Meal card 1 text", "type": "textarea", "rows": 3},
+    {"key": "field_sh_dpg_meal2Title", "name": "meal2Title", "label": "Meal card 2 title", "type": "text"},
+    {"key": "field_sh_dpg_meal2Text", "name": "meal2Text", "label": "Meal card 2 text", "type": "textarea", "rows": 3},
+    {"key": "field_sh_dpg_meal3Title", "name": "meal3Title", "label": "Meal card 3 title", "type": "text"},
+    {"key": "field_sh_dpg_meal3Text", "name": "meal3Text", "label": "Meal card 3 text", "type": "textarea", "rows": 3}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "dining_page"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "seamless",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "diningPageFields"
+}

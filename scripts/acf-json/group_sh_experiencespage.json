@@ -1,0 +1,23 @@
+{
+  "key": "group_sh_experiencespage",
+  "title": "Experiences Page",
+  "fields": [
+    {"key": "field_sh_epg_eyebrow", "name": "heroEyebrow", "label": "Hero eyebrow", "type": "text"},
+    {"key": "field_sh_epg_heading", "name": "heading", "label": "Page heading", "type": "textarea", "rows": 2},
+    {"key": "field_sh_epg_subheading", "name": "subheading", "label": "Page intro paragraph", "type": "textarea", "rows": 3},
+    {"key": "field_sh_epg_sidebarTitle", "name": "sidebarTitle", "label": "Detail sidebar title", "type": "text"},
+    {"key": "field_sh_epg_sidebarText", "name": "sidebarText", "label": "Detail sidebar text", "type": "textarea", "rows": 4},
+    {"key": "field_sh_epg_ctaLabel", "name": "ctaLabel", "label": "Detail sidebar button", "type": "text"},
+    {"key": "field_sh_epg_ctaUrl", "name": "ctaUrl", "label": "Detail sidebar button URL", "type": "text"}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "experiences_page"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "seamless",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "experiencesPageFields"
+}

@@ -2,7 +2,6 @@ import type {
 	Experience,
 	FAQ,
 	GalleryItem,
-	HomeContent,
 	HotelSettings,
 	Room,
 	Testimonial,
@@ -45,6 +44,8 @@ const img = (url: string, w = 1200, h = 800, alt: string) => ({
 export const mockSettings: HotelSettings = {
 	hotelName: "Shrestha Hotel Hotspring",
 	tagline: "Where the Mountains Meet Warm Waters",
+	subtagline:
+		"A peaceful Himalayan retreat shaped by nature, warm hospitality, and restorative natural hot springs.",
 	phone: "+977 9800000000",
 	email: "namaste@shresthahotel.com",
 	whatsapp: "+9779800000000",
@@ -63,64 +64,6 @@ export const mockSettings: HotelSettings = {
 	currency: "NPR",
 	footerDescription:
 		"A peaceful Himalayan retreat shaped by nature, warm hospitality, and restorative natural hot springs in the heart of Myagdi.",
-};
-
-export const mockHome: HomeContent = {
-	hero: {
-		eyebrow: "SHRESTHA HOTEL HOTSPRING",
-		heading: "Where the Mountains\nMeet Warm Waters",
-		subheading:
-			"A peaceful Himalayan retreat shaped by nature, warm hospitality, and restorative natural hot springs.",
-		image: img(
-			curated.hero,
-			1920,
-			1080,
-			"Himalayan mountains at dawn — Myagdi",
-		),
-		primaryCta: "Book Your Stay",
-		secondaryCta: "Explore the Hotel",
-	},
-	intro: {
-		heading: "Come for the mountains.\nStay for the warmth.",
-		body: "Nestled in the quiet folds of Myagdi, Shrestha Hotel Hotspring is a small, soulful retreat where forest air, stone and timber, and the hush of warm water set the rhythm of each day. Here, mornings begin with mist over the ridges and evenings end in the quiet glow of the hot spring — a place to slow down, breathe deeper, and feel held by the mountains.",
-		images: [
-			img(curated.intro1, 800, 1000, "Timber lodge interior with warm light"),
-			img(curated.intro2, 800, 600, "Pine forest and stone path"),
-		],
-	},
-	hotSpring: {
-		heading: "Nature's\nWarmest Welcome",
-		text: "Our natural hot spring is the heart of the hotel — mineral-rich waters gathered from deep Himalayan stone, held at a gentle warmth for slow, restorative bathing. Surrounded by timber, steam and forest light, it's a place for quiet restoration, shared silence, and the simple luxury of water that has traveled through the mountain to reach you.",
-		image: img(
-			curated.hotSpring,
-			1400,
-			900,
-			"Stone-lined hot spring with steam at dawn",
-		),
-		temperature: "38–42°C",
-		hours: "6:00 AM — 9:00 PM",
-		cta: "Discover the Hot Spring",
-	},
-	dining: {
-		heading: "From the Mountains\nto the Table",
-		text: "Food here follows the land — fresh, seasonal, and cooked with care. Warm dal and gundruk from nearby farms, wood-fired breads, mountain herbs, and Nepali hospitality served without hurry. Dine looking out to the valley, or by the fire when the evening turns cool.",
-		images: [
-			img(curated.dining1, 700, 900, "Mountain dining table with valley view"),
-			img(curated.dining2, 700, 700, "Nepali dal and wood-fired bread"),
-		],
-		cta: "Explore Dining",
-	},
-	finalCta: {
-		heading: "Your Mountain Escape Awaits",
-		description:
-			"Let the hot spring hold the day's quiet. Let the mountains do the rest.",
-		image: img(curated.finalCta, 1920, 900, "Misty Himalayan ridge at sunrise"),
-	},
-	about: {
-		heading: "Hospitality,\nheld lightly",
-		body: "Shrestha Hotel Hotspring began with a simple idea: a small place where people could be well — warm water, good food, and the quiet that the mountains do naturally.\n\nWe are a family-run retreat in Myagdi, built from local stone and timber, served by people from nearby villages.",
-		image: img(curated.intro1, 1000, 750, "Timber lodge interior with warm light"),
-	},
 };
 
 export const mockRooms: Room[] = [

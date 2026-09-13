@@ -1,0 +1,19 @@
+{
+  "key": "group_sh_aboutpage",
+  "title": "About Page",
+  "fields": [
+    {"key": "field_sh_apg_eyebrow", "name": "heroEyebrow", "label": "Hero eyebrow", "type": "text"},
+    {"key": "field_sh_apg_heading", "name": "heading", "label": "Page heading", "type": "textarea", "rows": 2},
+    {"key": "field_sh_apg_stats", "name": "stats", "label": "Stat cards (one value | label per line)", "type": "textarea", "rows": 4}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "about_page"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "seamless",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "aboutPageFields"
+}
