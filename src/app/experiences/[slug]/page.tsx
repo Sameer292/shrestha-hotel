@@ -2,7 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
-import { getExperienceBySlug, getExperiences } from "@/lib/wordpress/queries";
+import {
+	getExperienceBySlug,
+	getExperiences,
+	getExperiencesPage,
+} from "@/lib/wordpress/queries";
 
 export const revalidate = 10;
 export async function generateStaticParams() {
@@ -25,7 +29,10 @@ export default async function ExperiencePage({
 	params: Promise<{ slug: string }>;
 }) {
 	const { slug } = await params;
-	const ex = await getExperienceBySlug(slug);
+	const [ex, page] = await Promise.all([
+		getExperienceBySlug(slug),
+		getExperiencesPage(),
+	]);
 	if (!ex) notFound();
 	return (
 		<div className="pt-20">
@@ -77,17 +84,17 @@ export default async function ExperiencePage({
 				<aside className="lg:col-span-5">
 					<div className="bg-white border border-[var(--line)] rounded-[20px] p-6">
 						<h3 className="font-display text-lg text-[var(--forest)]">
-							Book this experience
+							{page?.sidebarTitle || "Book this experience"}
 						</h3>
 						<p className="text-sm text-[var(--muted)] mt-2">
-							Mention this experience when you book your stay — our team will
-							arrange timing around weather and season.
+							{page?.sidebarText ||
+								"Mention this experience when you book your stay — our team will arrange timing around weather and season."}
 						</p>
 						<Link
-							href="/booking"
+							href={page?.ctaUrl || "/booking"}
 							className="mt-4 block text-center bg-[var(--gold)] text-white py-3 rounded-full text-sm font-medium"
 						>
-							Enquire to Book
+							{page?.ctaLabel || "Enquire to Book"}
 						</Link>
 					</div>
 				</aside>

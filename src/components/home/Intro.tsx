@@ -1,20 +1,33 @@
 import Image from "next/image";
 
+const DEFAULT_STATS = [
+	{ value: "12", label: "Rooms & Suites" },
+	{ value: "38–42°", label: "Hot Spring" },
+	{ value: "Since", label: "Myagdi" },
+];
+
 export default function Intro({
 	heading,
 	body,
 	images,
+	stats,
+	eyebrow,
 }: {
 	heading: string;
 	body: string;
 	images: { url: string; alt: string }[];
+	stats?: { value: string; label: string }[];
+	eyebrow?: string;
 }) {
+	const shown = stats?.length ? stats : DEFAULT_STATS;
 	return (
 		<section className="py-16 md:py-24 bg-[var(--cream)]">
 			<div className="container-outer">
 				<div className="grid lg:grid-cols-12 gap-10 lg:gap-8 items-start">
 					<div className="lg:col-span-5 lg:sticky lg:top-28">
-						<p className="eyebrow text-[var(--moss)] mb-6">Our Story</p>
+						<p className="eyebrow text-[var(--moss)] mb-6">
+							{eyebrow || "Our Story"}
+						</p>
 						<h2 className="display text-[34px] md:text-[44px] text-[var(--forest)] whitespace-pre-line leading-[0.95]">
 							{heading}
 						</h2>
@@ -22,24 +35,14 @@ export default function Intro({
 							{body}
 						</p>
 						<div className="mt-8 flex gap-6 text-xs tracking-wide text-[var(--muted)] border-t border-[var(--line)] pt-6">
-							<span>
-								<strong className="text-[var(--forest)] block text-lg font-display">
-									12
-								</strong>{" "}
-								Rooms & Suites
-							</span>
-							<span>
-								<strong className="text-[var(--forest)] block text-lg font-display">
-									38–42°
-								</strong>{" "}
-								Hot Spring
-							</span>
-							<span>
-								<strong className="text-[var(--forest)] block text-lg font-display">
-									Since
-								</strong>{" "}
-								Myagdi
-							</span>
+							{shown.map((s) => (
+								<span key={`${s.value}-${s.label}`}>
+									<strong className="text-[var(--forest)] block text-lg font-display">
+										{s.value}
+									</strong>{" "}
+									{s.label}
+								</span>
+							))}
 						</div>
 					</div>
 					<div className="lg:col-span-7 grid grid-cols-12 gap-4">

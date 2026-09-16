@@ -5,10 +5,18 @@ export default function FinalCTA({
 	heading,
 	description,
 	image,
+	primaryCta,
+	primaryCtaUrl,
+	secondaryCta,
+	secondaryCtaUrl,
 }: {
 	heading: string;
 	description: string;
 	image: { url: string; alt: string };
+	primaryCta?: string;
+	primaryCtaUrl?: string;
+	secondaryCta?: string;
+	secondaryCtaUrl?: string;
 }) {
 	return (
 		<section className="relative overflow-hidden">
@@ -32,16 +40,16 @@ export default function FinalCTA({
 				</p>
 				<div className="flex gap-3 justify-center mt-8">
 					<Link
-						href="/booking"
+						href={primaryCtaUrl || "/booking"}
 						className="bg-[var(--forest)] text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition"
 					>
-						Book Your Stay
+						{primaryCta || "Book Your Stay"}
 					</Link>
 					<Link
-						href="/contact"
+						href={secondaryCtaUrl || "/contact"}
 						className="border border-white/30 text-white px-8 py-3 rounded-full text-sm font-medium backdrop-blur hover:bg-white/10 transition"
 					>
-						Contact Us
+						{secondaryCta || "Contact Us"}
 					</Link>
 				</div>
 			</div>

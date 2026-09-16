@@ -17,8 +17,14 @@ const NAV = [
 
 export default function Header({
 	bookingUrl = "/booking",
+	hotelName = "Shrestha Hotel",
+	phone = "+977 9800000000",
+	email = "namaste@shresthahotel.com",
 }: {
 	bookingUrl?: string;
+	hotelName?: string;
+	phone?: string;
+	email?: string;
 }) {
 	const [scrolled, setScrolled] = useState(false);
 	const [open, setOpen] = useState(false);
@@ -53,7 +59,7 @@ export default function Header({
 						</span>
 						<span className="leading-none text-[var(--forest)]">
 							<span className="block font-display text-[17px] tracking-[-0.02em] font-medium">
-								Shrestha Hotel
+								{hotelName.replace(/ Hotspring$/i, "")}
 							</span>
 							<span className="block text-[10px] tracking-[0.22em] uppercase opacity-70 -mt-[2px]">
 								Hotspring • Myagdi
@@ -121,9 +127,9 @@ export default function Header({
 						Book Your Stay
 					</Link>
 					<p className="text-xs text-[var(--muted)] mt-4 leading-relaxed">
-						Beni, Myagdi • +977 9800000000
+						Beni, Myagdi • {phone}
 						<br />
-						namaste@shresthahotel.com
+						{email}
 					</p>
 				</div>
 			</div>

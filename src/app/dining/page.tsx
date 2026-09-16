@@ -1,29 +1,55 @@
 import Image from "next/image";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
-import { getHomeContent } from "@/lib/wordpress/queries";
+import { getDiningPage } from "@/lib/wordpress/queries";
 
 export const metadata = { title: "Dining — From the Mountains to the Table" };
 export const revalidate = 10;
 
+const DEFAULT_MEALS = [
+	{
+		t: "Breakfast",
+		d: "Warm breads, mountain honey, seasonal fruit — served until 10:30 AM.",
+	},
+	{
+		t: "Lunch & Dinner",
+		d: "Dal, thali, wood-fired plates and valley herbs. Vegetarian options always available.",
+	},
+	{
+		t: "Dietary",
+		d: "Tell us your needs when booking — we cook with care for allergies and preferences.",
+	},
+];
+
 export default async function DiningPage() {
-	const home = await getHomeContent();
-	const d = home.dining;
+	const page = await getDiningPage();
+	const d = {
+		heading: page?.heading || "",
+		text: page?.subheading || "",
+		images:
+			page?.images?.length && page.images.length >= 2
+				? page.images
+				: [
+						{ url: "/placeholder.svg", alt: "Dining" },
+						{ url: "/placeholder.svg", alt: "Dining" },
+					],
+	};
+	const meals = page?.cards?.length
+		? page.cards.map((c) => ({ t: c.title, d: c.text }))
+		: DEFAULT_MEALS;
 	return (
 		<div className="pt-20">
 			<div className="container-outer pt-8">
 				<Breadcrumbs
 					items={[{ label: "Home", href: "/" }, { label: "Dining" }]}
 				/>
-				<p className="eyebrow text-[var(--moss)] mt-6">Dining</p>
+				<p className="eyebrow text-[var(--moss)] mt-6">
+					{page?.eyebrow || "Dining"}
+				</p>
 				<h1 className="display text-[40px] md:text-[52px] text-[var(--forest)] leading-none mt-2 whitespace-pre-line">
 					{d.heading}
 				</h1>
 				<p className="text-sm leading-relaxed text-[var(--muted)] max-w-[60ch] mt-4">
 					{d.text}
-				</p>
-				<p className="text-xs text-[var(--muted)] mt-2">
-					All dining copy and hours are CMS-controlled. Placeholder text is
-					marked as editable — replace without redeploying.
 				</p>
 			</div>
 			<div className="container-outer py-10 grid md:grid-cols-2 gap-4">
@@ -44,20 +70,7 @@ export default async function DiningPage() {
 				))}
 			</div>
 			<div className="container-outer pb-16 grid md:grid-cols-3 gap-6">
-				{[
-					{
-						t: "Breakfast",
-						d: "Warm breads, mountain honey, seasonal fruit — served until 10:30 AM.",
-					},
-					{
-						t: "Lunch & Dinner",
-						d: "Dal, thali, wood-fired plates and valley herbs. Vegetarian options always available.",
-					},
-					{
-						t: "Dietary",
-						d: "Tell us your needs when booking — we cook with care for allergies and preferences.",
-					},
-				].map((c) => (
+				{meals.map((c) => (
 					<div
 						key={c.t}
 						className="bg-white border border-[var(--line)] rounded-2xl p-6"

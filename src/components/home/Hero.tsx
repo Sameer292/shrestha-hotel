@@ -14,7 +14,9 @@ export default function Hero({
 		subheading: string;
 		image: { url: string; alt: string };
 		primaryCta: string;
+		primaryCtaUrl: string;
 		secondaryCta: string;
+		secondaryCtaUrl: string;
 	};
 }) {
 	const ref = useRef<HTMLDivElement>(null);
@@ -94,13 +96,13 @@ export default function Hero({
 					</p>
 					<div className="hero-ctas flex flex-wrap gap-3 mt-8">
 						<Link
-							href="/booking"
+							href={data.primaryCtaUrl || "/booking"}
 							className="bg-[var(--forest)] text-white px-7 py-3 rounded-full text-sm font-medium inline-flex items-center gap-2 hover:bg-[var(--forest-2)] transition"
 						>
 							{data.primaryCta} <ArrowRight size={14} />
 						</Link>
 						<Link
-							href="/stay"
+							href={data.secondaryCtaUrl || "/stay"}
 							className="border border-white/30 text-white px-7 py-3 rounded-full text-sm font-medium backdrop-blur hover:bg-white/10 transition"
 						>
 							{data.secondaryCta}

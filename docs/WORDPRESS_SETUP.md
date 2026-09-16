@@ -19,36 +19,93 @@ Install & activate:
 
 ## 3. Custom Post Types
 
-Create via CPT UI plugin or code (in a small must-use plugin). Each must be `show_in_graphql: true`:
+Registered in code (`scripts/mu-plugins/shrestha-cpts.php`, synced by
+`wp-setup.sh`). Every type is public for GraphQL but has no frontend
+URLs (`rewrite => false`, no archive, excluded from search).
 
-```php
-register_post_type('room', [
-  'public' => true, 'show_in_graphql' => true,
-  'graphql_single_name' => 'room', 'graphql_plural_name' => 'rooms',
-  'supports' => ['title','editor','thumbnail','excerpt'],
-]);
-register_post_type('experience', [ /* similar */ 'graphql_single_name'=>'experience','graphql_plural_name'=>'experiences' ]);
-register_post_type('testimonial', [ 'graphql_single_name'=>'testimonial','graphql_plural_name'=>'testimonials' ]);
-register_post_type('gallery_item', [ 'graphql_single_name'=>'galleryItem','graphql_plural_name'=>'galleryItems' ]);
-register_post_type('offer', [ 'graphql_single_name'=>'offer','graphql_plural_name'=>'offers' ]);
-register_post_type('faq', [ 'graphql_single_name'=>'faq','graphql_plural_name'=>'faqs' ]);
-```
+There are two families — do not mix them:
 
-Assign a featured image to every post; alt text is required.
+### 3a. Page CPTs (one entry per frontend page)
+
+Each is edited through its direct menu (`scripts/mu-plugins/
+sh-page-menus.php`), which opens the single entry straight away,
+options-page style — there is intentionally NO post list. Clicking
+e.g. **Stay Page** lands straight on the Stay edit screen
+(auto-created on first click). Every section of the page is a
+separate ACF field on that screen (see `scripts/acf-json/
+group_sh_*page.json`).
+
+Assign a featured image to every page entry (used as hero photo).
+
+| Admin menu | Entry slug | Holds |
+|---|---|---|
+| Home Content | `home` | Hotel name, tagline, sub-tagline (canonical — Hotel Settings resolves from here), hero (image = Featured image), Our Story, Location, footer, Final CTA |
+| Stay Page | `stay` | Listing hero + room-detail sidebar/CTA copy (cards auto-pull from Rooms) |
+| Hot Spring Page | `hot-spring` | Hero, teaser (homepage mirror), temperature/hours, info cards, etiquette, sidebar, FAQ category |
+| Experiences Page | `experiences` | Listing hero + experience-detail sidebar (items auto-pull from Experiences) |
+| Dining Page | `dining` | Hero, teaser (homepage mirror), page images, meal cards (repeater — page-section content, no detail page by design) |
+| Gallery Page | `gallery` | Hero only (photos auto-pull from Gallery Items) |
+| About Page | `about` | Hero, body (= post content), photo (= Featured image), stat cards |
+| Contact Page | `contact` | Hero, form intro, form card title (address/phone/map from Hotel Settings) |
+
+### 3b. Item CPTs (one post per list item — normal post lists)
+
+Rooms, Experiences, Testimonials, Gallery Items, FAQs. Each is a
+regular wp-admin list: add/edit/trash per item, featured image per
+item (card + detail hero), Display order for sorting, Featured
+checkbox for homepage picks. Detail URLs (`/stay/:slug`,
+`/experiences/:slug`) come from the post slug. Fields live in
+`scripts/acf-json/group_sh_room.json`,
+`group_sh_exp.json`, `group_sh_test.json`,
+`group_sh_gallery.json`, `group_sh_faq.json`; long description =
+post content, short excerpt = post excerpt.
+
+| Admin menu | Post type | Key fields |
+|---|---|---|
+| Rooms | `room` | startingPrice, currency, capacity, adults, children, bedType, roomSize, view, amenities (one per line), checkIn, checkOut, gallery, featured, displayOrder |
+| Experiences | `experience` | duration, difficulty, season, optionalPrice, gallery, featured |
+| Testimonials | `testimonial` | guestName, guestLocation, quote, rating (1–5), featured |
+| Gallery Items | `gallery_item` | category (Hotel/Rooms/Hot Spring/Nature/Dining/Experiences), caption, displayOrder — featured image = the photo itself |
+| FAQs | `faq` | question, answer, category (e.g. Hot Spring, Stay), displayOrder |
+
+Seed/update everything with `bash scripts/seed-all-content.sh`
+(idempotent, upserts by slug — never hardcodes IDs), then
+`seed-images.php` for demo featured images (skips posts that
+already have one).
 
 ## 4. ACF field groups
 
-For each CPT, create an ACF field group with location = Post Type is equal to that CPT.
+For each CPT, the ACF field group in `scripts/acf-json/` (location =
+Post Type is equal to that CPT) defines its fields — field names must
+match `src/lib/wordpress/queries.ts` (queried lowercase, e.g.
+`startingPrice` → `startingprice`).
 
-**Room fields** (field names must match `types.ts`): `startingPrice` (number), `currency` (select NPR/USD), `capacity` (number), `adults`, `children`, `bedType` (text), `roomSize` (text e.g. "38 m²"), `view` (text), `amenities` (text, comma-separated), `checkIn`, `checkOut`, `featured` (true/false), `displayOrder` (number), `gallery` (gallery). Long description = post content; short = excerpt. Also add SEO fields if not using Yoast.
+**Room** (`room`, `group_sh_room.json`): `startingPrice` (number),
+`currency` (select NPR/USD), `capacity`, `adults`, `children`,
+`bedType`, `roomSize` (e.g. "38 m²"), `view`, `amenities` (textarea,
+one per line), `checkIn`, `checkOut`, `gallery` (gallery),
+`featured` (true/false), `displayOrder` (number). Long description =
+post content; short = excerpt; card + detail hero = featured image.
 
-**Experience**: `duration`, `difficulty`, `season`, `optionalPrice`, `featured`, `gallery`.
+**Experience** (`experience`, `group_sh_exp.json`):
+`duration`, `difficulty`, `season`, `optionalPrice`, `gallery`,
+`featured`.
 
-**Testimonial**: `guestName`, `guestLocation`, `quote` (textarea), `rating` (1-5), `featured`.
+**Testimonial** (`testimonial`, `group_sh_test.json`):
+`guestName` (empty = post title), `guestLocation`, `quote`
+(textarea), `rating` (1–5), `featured`. No photo — cards show stars,
+quote, name by design.
 
-**Gallery Item**: `category` (select: Hotel, Rooms, Hot Spring, Nature, Dining, Experiences), `caption`, `displayOrder`.
+**Gallery Item** (`gallery_item`, `group_sh_gallery.json`):
+`category` (select: Hotel, Rooms, Hot Spring, Nature, Dining,
+Experiences), `caption` (empty = post title), `displayOrder`.
+Featured image = the photo itself.
 
-**FAQ**: `question`, `answer`, `category`, `displayOrder`.
+**FAQ** (`faq`, `group_sh_faq.json`): `question` (empty = post
+title), `answer`, `category` (e.g. Hot Spring, Stay), `displayOrder`.
+
+**Offer** (`offer`, `group_sh_offer.json`): reserved for a future
+offers section — nothing in the app reads it yet.
 
 Organize fields into tabs: Basic Information / Details / Amenities / Images / Pricing / SEO — keep it pleasant for hotel staff.
 

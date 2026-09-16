@@ -3,22 +3,16 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Lightbox from "@/components/common/Lightbox";
 import { mockGallery } from "@/lib/wordpress/mock";
-import type { GalleryItem } from "@/lib/wordpress/types";
-
-const cats = [
-	"All",
-	"Hotel",
-	"Rooms",
-	"Hot Spring",
-	"Nature",
-	"Dining",
-	"Experiences",
-];
+import type {
+	GalleryItem,
+	GalleryPage as GalleryPageData,
+} from "@/lib/wordpress/types";
 
 export default function GalleryPage() {
 	const [cat, setCat] = useState("All");
 	const [idx, setIdx] = useState<number | null>(null);
 	const [items, setItems] = useState<GalleryItem[]>(mockGallery);
+	const [page, setPage] = useState<GalleryPageData | null>(null);
 	useEffect(() => {
 		fetch("/api/gallery")
 			.then((r) => (r.ok ? r.json() : null))
@@ -26,16 +20,25 @@ export default function GalleryPage() {
 				if (Array.isArray(d) && d.length) setItems(d);
 			})
 			.catch(() => {});
+		fetch("/api/page-content?page=gallery")
+			.then((r) => (r.ok ? r.json() : null))
+			.then((d) => {
+				if (d && typeof d === "object") setPage(d);
+			})
+			.catch(() => {});
 	}, []);
+	const cats = ["All", ...Array.from(new Set(items.map((g) => g.category)))];
 	const filtered =
 		cat === "All" ? items : items.filter((g) => g.category === cat);
 	const images = filtered.map((g) => g.image);
 	return (
 		<div className="pt-20">
 			<div className="container-outer pt-8 pb-6">
-				<p className="eyebrow text-[var(--moss)]">Gallery</p>
-				<h1 className="display text-[40px] md:text-[52px] text-[var(--forest)] leading-none mt-2">
-					A place in pictures
+				<p className="eyebrow text-[var(--moss)]">
+					{page?.eyebrow || "Gallery"}
+				</p>
+				<h1 className="display text-[40px] md:text-[52px] text-[var(--forest)] leading-none mt-2 whitespace-pre-line">
+					{page?.heading || "A place in pictures"}
 				</h1>
 				<div className="flex flex-wrap gap-2 mt-6">
 					{cats.map((c) => (

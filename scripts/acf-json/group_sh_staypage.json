@@ -1,0 +1,24 @@
+{
+  "key": "group_sh_staypage",
+  "title": "Stay Page",
+  "fields": [
+    {"key": "field_sh_spg_eyebrow", "name": "heroEyebrow", "label": "Hero eyebrow", "type": "text"},
+    {"key": "field_sh_spg_heading", "name": "heading", "label": "Page heading", "type": "textarea", "rows": 2},
+    {"key": "field_sh_spg_subheading", "name": "subheading", "label": "Page intro paragraph", "type": "textarea", "rows": 3},
+    {"key": "field_sh_spg_sidebarText", "name": "sidebarText", "label": "Room detail sidebar note", "type": "textarea", "rows": 4},
+    {"key": "field_sh_spg_ctaLabel", "name": "ctaLabel", "label": "Room detail primary button", "type": "text"},
+    {"key": "field_sh_spg_ctaUrl", "name": "ctaUrl", "label": "Room detail primary button URL", "type": "text"},
+    {"key": "field_sh_spg_cta2Label", "name": "secondaryCtaLabel", "label": "Room detail secondary button", "type": "text"},
+    {"key": "field_sh_spg_cta2Url", "name": "secondaryCtaUrl", "label": "Room detail secondary button URL", "type": "text"}
+  ],
+  "location": [[{"param": "post_type", "operator": "==", "value": "stay_page"}]],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "seamless",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "show_in_rest": 1,
+  "show_in_graphql": 1,
+  "graphql_field_name": "stayPageFields"
+}

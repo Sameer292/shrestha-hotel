@@ -1,56 +1,66 @@
 # CMS Content Audit — every image & field in the app
 
 Rule: **no hardcoded content images** — everything below is editable in
-`wp-admin` (CPT entries, featured images, or the **Hotel Content** page).
+`wp-admin` (item CPT posts, featured images, or page CPT entries).
 Mock data in `src/lib/wordpress/mock.ts` is offline fallback only.
 
 ## Images — app surface → CMS source
 
 | # | Where | CMS source | Status |
 |---|---|---|---|
-| 1 | Homepage hero | Hotel Content → Hero → image | ✅ ready |
-| 2 | Homepage intro (2) | Hotel Content → Intro → images | ✅ ready |
-| 3 | Homepage hot-spring card | Hotel Content → Hot Spring → image | ✅ ready |
-| 4 | Room cards + detail hero | Room → Featured image | ✅ ready |
-| 5 | Room detail gallery (3) | Room → **Gallery** (ACF gallery) | ✅ **added** (was missing) |
-| 6 | Experience cards + detail hero | Experience → Featured image | ✅ ready |
-| 7 | Homepage dining (2) | Hotel Content → Dining → images | ✅ ready |
-| 8 | `/dining` page images | Hotel Content → Dining → images | ✅ **wired** (was mock) |
-| 9 | `/hot-spring` hero | Hotel Content → Hot Spring → image | ✅ **wired** (was mock) |
-| 10 | Gallery (all) | Gallery Items → Featured image + Category | ✅ **wired** (was mock, via `/api/gallery`) |
-| 11 | Final CTA background | Hotel Content → Final CTA → image | ✅ ready |
-| 12 | `/about` photo + story | Hotel Content → **About** (heading/body/image) | ✅ **added** (was picsum placeholder) |
+| 1 | Homepage hero | Home Content entry → Featured image | ✅ ready |
+| 2 | Homepage intro (2) | Home Content → Our story images (gallery) | ✅ ready |
+| 3 | Homepage hot-spring card | Hot Spring Page entry → Featured image | ✅ ready |
+| 4 | Room cards + detail hero | Room post → Featured image | ✅ ready |
+| 5 | Room detail gallery | Room post → Gallery (ACF gallery) | ✅ ready |
+| 6 | Experience cards + detail hero | Experience post → Featured image | ✅ ready |
+| 7 | Homepage dining (2) | Dining Page → Page images (gallery) | ✅ ready |
+| 8 | `/dining` page images | Dining Page → Page images (gallery) | ✅ ready |
+| 9 | `/hot-spring` hero | Hot Spring Page entry → Featured image | ✅ ready |
+| 10 | Gallery (all) | Gallery Items → Featured image + Category | ✅ ready |
+| 11 | Final CTA background | Home Content → Final CTA image (gallery) | ✅ ready |
+| 12 | `/about` photo + story | About Page → Featured image + body (= post content) | ✅ ready |
 | 13 | Testimonials | none — quote cards, no photos by design | — n/a |
 
-How to change any image: **Media Library → upload**, then set as the entry's
-Featured image, Gallery item, or paste its URL into the matching Hotel Content
-field (`URL | alt` per line for lists).
+How to change any image: **Media Library → upload**, then set as the
+post's Featured image or ACF gallery item.
 
 ## CPTs × ACF fields
 
-**Room** (`room`): startingPrice, currency, capacity, adults, children,
-bedType, roomSize, view, amenities, checkIn, checkOut, featured,
-displayOrder — ✅ all ready. **gallery (gallery)** ✅ **added**.
+**Page CPTs** (one entry each, direct-edit menus, every section a
+separate ACF field): Home Content (`home_content`), Stay
+(`stay_page`), Hot Spring (`hot_spring_page`), Experiences
+(`experiences_page`), Dining (`dining_page` — incl. meal-cards
+repeater), Gallery (`gallery_page`), About (`about_page`), Contact
+(`contact_page`). Groups in `scripts/acf-json/group_sh_*page.json`.
+
+**Room** (`room`, `group_sh_room.json`): startingPrice, currency,
+capacity, adults, children, bedType, roomSize, view, amenities (one
+per line), checkIn, checkOut, gallery, featured, displayOrder.
 Featured image = card + detail hero.
 
-**Experience** (`experience`): duration, difficulty, season, optionalPrice,
-featured — ✅ all ready. Featured image = card + detail hero.
-(No gallery field — detail page shows no gallery by design.)
+**Experience** (`experience`, `group_sh_exp.json`): duration,
+difficulty, season, optionalPrice, gallery, featured. Featured image
+= card + detail hero.
 
-**Testimonial** (`testimonial`): guestName, guestLocation, quote, rating,
-featured — ✅ all ready. (No photo — cards show stars, quote, name.)
+**Testimonial** (`testimonial`, `group_sh_test.json`):
+guestName, guestLocation, quote, rating, featured. (No photo — cards
+show stars, quote, name.)
 
-**Gallery Item** (`gallery_item`): category, caption, displayOrder — ✅ all
-ready. Featured image = the photo itself.
+**Gallery Item** (`gallery_item`, `group_sh_gallery.json`):
+category, caption, displayOrder. Featured image = the photo itself.
 
-**FAQ** (`faq`): question, answer, category, displayOrder — ✅ all ready.
+**FAQ** (`faq`, `group_sh_faq.json`): question, answer, category,
+displayOrder.
 
-**Offer** (`offer` CPT + ACF group exist in WP): **nothing in the app reads
-it** — reserved for a future offers section, safely ignorable.
+**Offer** (`offer`, `group_sh_offer.json`): reserved — nothing in the
+app reads it yet.
 
-**Hotel Content** (options page, no ACF Pro needed): Hotel Settings (18
-fields) + Hero / Intro / Hot Spring / Dining / Final CTA / **About** sections
-— ✅ all ready, editable at WP Admin → Hotel Content.
+**Hotel Content** (options page, no ACF Pro needed): Hotel Settings
+operational globals only (phone, email, address, socials, check-in/
+out, currency, booking URL, footer description) — identity
+(hotelName/tagline/subtagline) lives on the Home Content entry.
+Editable at WP Admin → Hotel Content.
 
 ## Forms (not mock — real delivery)
 
@@ -62,6 +72,7 @@ honeypot field + 5/hour per IP. Test: submit → entry appears in Inquiries.
 
 ## Fresh-machine order
 
-`scripts/dev.sh` → `migrate-content.sh` → `set-room-meta.sh` →
-`set-all-meta.sh` → `seed-images.php` (featured images) → galleries are
-empty until staff adds photos (detail pages hide the strip when empty).
+`scripts/dev.sh` → `wp-setup.sh` (core + plugins + CPTs + ACF JSON)
+→ `seed-all-content.sh` (8 page entries + all item posts; idempotent,
+upserts by slug, wipes stale repeater meta) → `seed-images.php` (demo
+featured images; skips posts that already have one).

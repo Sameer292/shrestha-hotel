@@ -15,14 +15,30 @@ const nextConfig: NextConfig = {
       /* keep default */
     }
     return [
+      { source: "/wp-admin/:path*", destination: `${origin}/wp-admin/:path*` },
+      { source: "/wp-login.php", destination: `${origin}/wp-login.php` },
+      { source: "/wp-login.php/:path*", destination: `${origin}/wp-login.php/:path*` },
+      { source: "/wp-json/:path*", destination: `${origin}/wp-json/:path*` },
+      { source: "/graphql", destination: `${origin}/graphql` },
+      { source: "/graphql/:path*", destination: `${origin}/graphql/:path*` },
+      { source: "/xmlrpc.php", destination: `${origin}/xmlrpc.php` },
+      { source: "/wp-cron.php", destination: `${origin}/wp-cron.php` },
       {
-        source: "/wp-content/uploads/:path*",
-        destination: `${origin}/wp-content/uploads/:path*`,
+        source: "/wp-content/:path*",
+        destination: `${origin}/wp-content/:path*`,
       },
+      { source: "/wp-includes/:path*", destination: `${origin}/wp-includes/:path*` },
     ];
   },
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "picsum.photos" }, { protocol: "https", hostname: "cms.shresthahotel.com" }, { protocol: "https", hostname: "**" }],
+    // Local-first: WP Media Library on the VPS (prod) or docker (dev).
+    // images.unsplash.com stays only until real photos are uploaded —
+    // then remove it. No picsum, no wildcards.
+    remotePatterns: [
+      { protocol: "http", hostname: "localhost", port: "8080" },
+      { protocol: "https", hostname: "cms.shresthahotel.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+    ],
   },
 };
 

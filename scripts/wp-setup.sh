@@ -24,7 +24,8 @@ fi
 
 echo "==> Installing plugins..."
 docker compose run --rm --user 33:33 wpcli --path=/var/www/html plugin install wp-graphql --activate || true
-docker compose run --rm --user 33:33 wpcli --path=/var/www/html plugin install https://github.com/wp-graphql/wp-graphql-acf/archive/refs/heads/master.zip --activate || true
+docker compose run --rm --user 33:33 wpcli --path=/var/www/html plugin is-installed wp-graphql-acf || \
+  docker compose run --rm --user 33:33 wpcli --path=/var/www/html plugin install https://github.com/wp-graphql/wp-graphql-acf/archive/refs/heads/master.zip --activate || true
 # ACF Pro is paid — install free ACF if Pro not present
 docker compose run --rm --user 33:33 wpcli --path=/var/www/html plugin is-installed advanced-custom-fields || \
   docker compose run --rm --user 33:33 wpcli --path=/var/www/html plugin install advanced-custom-fields --activate || true

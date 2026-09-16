@@ -1,16 +1,31 @@
 import Image from "next/image";
-import { getHomeContent } from "@/lib/wordpress/queries";
+import { getAboutPage } from "@/lib/wordpress/queries";
 
 export const metadata = { title: "About — Our Story" };
 export const revalidate = 10;
 
+const DEFAULT_STATS = [
+	{ k: "Local", v: "Built and run with Myagdi families" },
+	{ k: "Small", v: "12 rooms — calm over crowds" },
+	{ k: "Warm", v: "Hot spring at the heart" },
+];
+
 export default async function AboutPage() {
-	const home = await getHomeContent();
-	const a = home.about;
+	const page = await getAboutPage();
+	const a = {
+		heading: page?.heading || "Hospitality,\nheld lightly",
+		body: page?.body || "",
+		image: page?.image ?? { url: "/placeholder.svg", alt: "About" },
+	};
+	const stats = page?.stats?.length
+		? page.stats.map((s) => ({ k: s.value, v: s.label }))
+		: DEFAULT_STATS;
 	return (
 		<div className="pt-20">
 			<div className="container-outer pt-8 pb-10">
-				<p className="eyebrow text-[var(--moss)]">About</p>
+				<p className="eyebrow text-[var(--moss)]">
+					{page?.eyebrow || "About"}
+				</p>
 				<h1 className="display text-[40px] md:text-[56px] text-[var(--forest)] leading-none mt-2 max-w-[12ch] whitespace-pre-line">
 					{a.heading}
 				</h1>
@@ -25,11 +40,7 @@ export default async function AboutPage() {
 							</p>
 						))}
 						<div className="grid grid-cols-3 gap-4 mt-8">
-							{[
-								{ k: "Local", v: "Built and run with Myagdi families" },
-								{ k: "Small", v: "12 rooms — calm over crowds" },
-								{ k: "Warm", v: "Hot spring at the heart" },
-							].map((c) => (
+							{stats.map((c) => (
 								<div
 									key={c.k}
 									className="bg-white border border-[var(--line)] rounded-2xl p-4"

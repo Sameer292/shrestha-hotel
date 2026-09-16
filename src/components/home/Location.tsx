@@ -2,21 +2,26 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import type { HotelSettings } from "@/lib/wordpress/types";
 
-export default function Location({ settings }: { settings: HotelSettings }) {
+export default function Location({
+	settings,
+	heading,
+	text,
+}: {
+	settings: HotelSettings;
+	heading?: string;
+	text?: string;
+}) {
 	return (
 		<section className="py-16 md:py-20 bg-[var(--cream-2)] border-y border-[var(--line)]">
 			<div className="container-outer grid lg:grid-cols-12 gap-8">
 				<div className="lg:col-span-5">
 					<p className="eyebrow text-[var(--moss)] mb-4">Location</p>
-					<h2 className="display text-[34px] md:text-[40px] text-[var(--forest)] leading-none">
-						In the quiet
-						<br />
-						of Myagdi
+					<h2 className="display text-[34px] md:text-[40px] text-[var(--forest)] leading-none whitespace-pre-line">
+						{heading || "In the quiet\nof Myagdi"}
 					</h2>
 					<p className="text-sm leading-relaxed text-[var(--muted)] mt-5 max-w-[42ch]">
-						Set in Beni, gateway to the Annapurna and Dhaulagiri trails — where
-						the valley holds warmth and the ridges hold silence. Close enough to
-						reach, far enough to feel away.
+						{text ||
+							"Set in Beni, gateway to the Annapurna and Dhaulagiri trails — where the valley holds warmth and the ridges hold silence. Close enough to reach, far enough to feel away."}
 					</p>
 					<ul className="mt-6 space-y-3 text-sm">
 						<li className="flex gap-3 items-start">

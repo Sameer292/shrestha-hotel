@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { formatPrice } from "@/lib/utils";
-import { getRoomBySlug, getRooms } from "@/lib/wordpress/queries";
+import { getRoomBySlug, getRooms, getStayPage } from "@/lib/wordpress/queries";
 
 export const revalidate = 10;
 export async function generateStaticParams() {
@@ -38,7 +38,7 @@ export default async function RoomPage({
 	const { slug } = await params;
 	const room = await getRoomBySlug(slug);
 	if (!room) notFound();
-	const rooms = await getRooms();
+	const [rooms, page] = await Promise.all([getRooms(), getStayPage()]);
 	const related = rooms.filter((r) => r.slug !== slug).slice(0, 2);
 	return (
 		<div className="pt-20">
@@ -130,21 +130,20 @@ export default async function RoomPage({
 							</p>
 						</div>
 						<Link
-							href="/booking"
+							href={page?.ctaUrl || "/booking"}
 							className="mt-5 block text-center bg-[var(--gold)] text-white py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition"
 						>
-							Check Availability
+							{page?.ctaLabel || "Check Availability"}
 						</Link>
 						<a
-							href="/contact"
+							href={page?.secondaryCtaUrl || "/contact"}
 							className="mt-2 block text-center border border-[var(--line)] py-3 rounded-full text-sm hover:bg-[var(--cream-2)] transition"
 						>
-							Ask a Question
+							{page?.secondaryCtaLabel || "Ask a Question"}
 						</a>
 						<p className="text-xs text-[var(--muted)] mt-4 leading-relaxed">
-							This is a reservation inquiry — no fake availability. Integrates
-							with your PMS/booking engine via the Booking URL in WordPress
-							settings.
+							{page?.sidebarText ||
+								"This is a reservation inquiry — no fake availability. Integrates with your PMS/booking engine via the Booking URL in WordPress settings."}
 						</p>
 					</div>
 					{related.length > 0 && (

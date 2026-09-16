@@ -6,10 +6,14 @@ export default function DiningPreview({
 	heading,
 	text,
 	images,
+	cta,
+	ctaUrl,
 }: {
 	heading: string;
 	text: string;
 	images: { url: string; alt: string }[];
+	cta?: string;
+	ctaUrl?: string;
 }) {
 	return (
 		<section className="py-16 md:py-24 bg-[var(--cream)]">
@@ -22,12 +26,12 @@ export default function DiningPreview({
 					<p className="text-[15px] leading-relaxed text-[var(--muted)] mt-6 max-w-[42ch]">
 						{text}
 					</p>
-					<Link
-						href="/dining"
-						className="mt-8 inline-flex items-center gap-2 bg-[var(--forest)] text-white px-7 py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition"
-					>
-						Explore Dining <ArrowUpRight size={14} />
-					</Link>
+						<Link
+							href={ctaUrl || "/dining"}
+							className="mt-8 inline-flex items-center gap-2 bg-[var(--forest)] text-white px-7 py-3 rounded-full text-sm font-medium hover:bg-[var(--forest-2)] transition"
+						>
+							{cta || "Explore Dining"} <ArrowUpRight size={14} />
+						</Link>
 				</div>
 				<div className="lg:col-span-7 grid grid-cols-12 gap-4">
 					<div className="col-span-7 relative aspect-[4/5] rounded-[18px] overflow-hidden">

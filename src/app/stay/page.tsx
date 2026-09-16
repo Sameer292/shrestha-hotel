@@ -3,29 +3,28 @@ import Image from "next/image";
 import Link from "next/link";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { formatPrice } from "@/lib/utils";
-import { getRooms } from "@/lib/wordpress/queries";
+import { getRooms, getStayPage } from "@/lib/wordpress/queries";
 
 export const metadata: Metadata = { title: "Stay — Rooms & Suites" };
 export const revalidate = 10;
 
 export default async function StayPage() {
-	const rooms = await getRooms();
+	const [rooms, page] = await Promise.all([getRooms(), getStayPage()]);
 	return (
 		<div className="pt-20">
 			<div className="container-outer pt-8 pb-6">
 				<Breadcrumbs
 					items={[{ label: "Home", href: "/" }, { label: "Stay" }]}
 				/>
-				<p className="eyebrow text-[var(--moss)] mt-6">Stay</p>
-				<h1 className="display text-[40px] md:text-[56px] text-[var(--forest)] leading-none mt-2">
-					Rooms shaped by
-					<br />
-					mountain quiet
+				<p className="eyebrow text-[var(--moss)] mt-6">
+					{page?.eyebrow || "Stay"}
+				</p>
+				<h1 className="display text-[40px] md:text-[56px] text-[var(--forest)] leading-none mt-2 whitespace-pre-line">
+					{page?.heading || "Rooms shaped by\nmountain quiet"}
 				</h1>
 				<p className="text-[15px] leading-relaxed text-[var(--muted)] max-w-[52ch] mt-4">
-					Timber, stone and linen — each room faces the valley or forest, with
-					private baths and direct access to the hot spring. Edit all content
-					from WordPress without redeploying.
+					{page?.subheading ||
+						"Timber, stone and linen — each room faces the valley or forest, with private baths and direct access to the hot spring."}
 				</p>
 			</div>
 			<div className="container-outer pb-16 grid md:grid-cols-2 gap-6">

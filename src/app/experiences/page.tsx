@@ -1,27 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
-import { getExperiences } from "@/lib/wordpress/queries";
+import { getExperiences, getExperiencesPage } from "@/lib/wordpress/queries";
 
 export const revalidate = 10;
 export const metadata = { title: "Experiences — Mountains, Villages & Rivers" };
 
 export default async function ExperiencesPage() {
-	const items = await getExperiences();
+	const [items, page] = await Promise.all([
+		getExperiences(),
+		getExperiencesPage(),
+	]);
 	return (
 		<div className="pt-20">
 			<div className="container-outer pt-8">
 				<Breadcrumbs
 					items={[{ label: "Home", href: "/" }, { label: "Experiences" }]}
 				/>
-				<p className="eyebrow text-[var(--moss)] mt-6">Experiences</p>
-				<h1 className="display text-[40px] md:text-[52px] text-[var(--forest)] leading-none mt-2">
-					What the day asks for
+				<p className="eyebrow text-[var(--moss)] mt-6">
+					{page?.eyebrow || "Experiences"}
+				</p>
+				<h1 className="display text-[40px] md:text-[52px] text-[var(--forest)] leading-none mt-2 whitespace-pre-line">
+					{page?.heading || "What the day asks for"}
 				</h1>
 				<p className="text-sm text-[var(--muted)] max-w-[56ch] mt-3 leading-relaxed">
-					All experiences are managed in WordPress — add, remove or rewrite
-					without touching code. Durations and seasons are optional; empty
-					fields simply don’t render.
+					{page?.subheading ||
+						"Small groups, local guides, weather-wise timing — every experience is arranged by our team."}
 				</p>
 			</div>
 			<div className="container-outer py-10 grid md:grid-cols-2 lg:grid-cols-3 gap-6">

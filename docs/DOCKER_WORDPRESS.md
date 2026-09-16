@@ -10,8 +10,7 @@ bash scripts/dev.sh   # docker (db + WP + proxy) then Next.js; bootstraps WP on 
 # --- everything below happens automatically; manual equivalents follow ---
 docker compose up -d
 bash scripts/wp-setup.sh http://cms.shrestha.localhost:8081   # core + plugins + CPTs + ACF JSON
-bash scripts/migrate-content.sh   # rooms, experiences, testimonials, gallery, FAQs
-bash scripts/set-room-meta.sh && bash scripts/set-all-meta.sh  # ACF field values
+bash scripts/seed-all-content.sh  # Home Content + 7 page CPTs (rooms, experiences, photos, testimonials, FAQs, meals nested inside)
 # featured images (one WP-CLI run, idempotent):
 docker compose cp scripts/seed-images.php wordpress:/var/www/html/seed-images.php
 docker compose run --rm wpcli --path=/var/www/html eval-file seed-images.php

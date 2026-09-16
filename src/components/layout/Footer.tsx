@@ -1,11 +1,39 @@
+import Image from "next/image";
 import Link from "next/link";
 import { mockSettings } from "@/lib/wordpress/mock";
+import type { HotelSettings } from "@/lib/wordpress/types";
 
-export default function Footer() {
-	const s = mockSettings;
+export default function Footer({
+	settings,
+	footer,
+}: {
+	settings?: HotelSettings;
+	footer?: {
+		background?: { url: string; alt: string };
+		tagline?: string;
+		subtagline?: string;
+	};
+}) {
+	const s = settings ?? mockSettings;
 	const year = new Date().getFullYear();
+	const tagline = footer?.tagline || s.tagline;
+	const subtagline = footer?.subtagline || s.subtagline;
 	return (
-		<footer className="bg-[var(--gold)] text-[var(--cream)]">
+		<footer className="relative bg-[var(--gold)] text-[var(--cream)] overflow-hidden">
+			{footer?.background && (
+				<>
+					<Image
+						src={footer.background.url}
+						alt={footer.background.alt}
+						fill
+						className="object-cover"
+						unoptimized
+						sizes="100vw"
+					/>
+					<div className="absolute inset-0 bg-[var(--gold)]/85" />
+				</>
+			)}
+			<div className="relative">
 			<div className="container-outer py-14 md:py-16">
 				<div className="grid md:grid-cols-12 gap-10">
 					<div className="md:col-span-5">
@@ -15,13 +43,18 @@ export default function Footer() {
 							</span>
 							<span className="leading-none">
 								<span className="block font-display text-lg">
-									Shrestha Hotel Hotspring
+									{s.hotelName}
 								</span>
 								<span className="block text-[10px] tracking-[0.22em] uppercase opacity-60">
-									Myagdi • Nepal
+									{tagline}
 								</span>
 							</span>
 						</div>
+						{subtagline && (
+							<p className="text-sm leading-relaxed opacity-70 mt-5 max-w-[36ch]">
+								{subtagline}
+							</p>
+						)}
 						<p className="text-sm leading-relaxed opacity-70 mt-5 max-w-[36ch]">
 							{s.footerDescription}
 						</p>
@@ -133,7 +166,9 @@ export default function Footer() {
 				</div>
 
 				<div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row gap-3 justify-between text-xs opacity-50">
-					<span>© {year} Shrestha Hotel Hotspring. All rights reserved.</span>
+					<span>
+						© {year} {s.hotelName}. All rights reserved.
+					</span>
 					<span className="flex gap-4">
 						<Link href="/privacy" className="hover:opacity-80">
 							Privacy
@@ -146,6 +181,7 @@ export default function Footer() {
 						</Link>
 					</span>
 				</div>
+			</div>
 			</div>
 		</footer>
 	);
