@@ -186,8 +186,10 @@ export type GalleryPage = {
 export type AboutPage = {
 	eyebrow: string;
 	heading: string;
+	description: string;
 	body: string;
 	image: Media;
+	carouselImages: Media[];
 	facilities: { title: string; text: string }[];
 	services: { title: string; text: string }[];
 	locationHeading: string;

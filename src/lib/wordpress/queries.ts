@@ -283,6 +283,10 @@ type WPPageFields = {
 	sustainabilityitems?: string | null;
 	facilitieslist?: string | null;
 	serviceslist?: string | null;
+	aboutdescription?: string | null;
+	aboutimage1?: WPImage | null;
+	aboutimage2?: WPImage | null;
+	aboutimage3?: WPImage | null;
 	eventimage1?: WPImage | null;
 	eventimage2?: WPImage | null;
 	eventcards?: string | null;
@@ -682,7 +686,8 @@ const ABOUT_PAGE_FIELDS = `
 	slug title excerpt content
 	featuredImage { node { sourceUrl altText } }
 	aboutPageFields {
-		heroeyebrow heading
+		heroeyebrow heading aboutdescription
+		aboutimage1 { sourceUrl altText } aboutimage2 { sourceUrl altText } aboutimage3 { sourceUrl altText }
 		facilitieslist serviceslist
 		locationheading locationtext locationmapimage { sourceUrl altText }
 		sustainabilityheading sustainabilitytext sustainabilityitems faqcategory
@@ -696,11 +701,27 @@ export async function getAboutPage(): Promise<AboutPage | null> {
 	const n = data?.aboutPages?.nodes?.[0];
 	if (!n) return null;
 	const f = n.aboutPageFields;
+	const feat = pageImage(n);
+	const extras = wpImages(
+		[f?.aboutimage1, f?.aboutimage2, f?.aboutimage3],
+		n.title,
+	);
+	const seen = new Set<string>();
+	const all = [feat, ...extras].filter((m) => {
+		if (seen.has(m.url)) return false;
+		seen.add(m.url);
+		return true;
+	});
+	// Prefer real photos: drop the placeholder once extras exist.
+	const carouselImages =
+		all.length > 1 ? all.filter((m) => m.url !== PLACEHOLDER_IMAGE) : all;
 	return {
 		eyebrow: f?.heroeyebrow || "About",
 		heading: f?.heading || n.title,
+		description: clean(f?.aboutdescription),
 		body: clean(n.content),
-		image: pageImage(n),
+		image: feat,
+		carouselImages,
 		facilities: parseCardLines(f?.facilitieslist),
 		services: parseCardLines(f?.serviceslist),
 		locationHeading: clean(f?.locationheading),

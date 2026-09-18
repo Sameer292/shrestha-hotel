@@ -217,7 +217,7 @@ add_action('save_post', function ($post_id) {
         'galleryImage1', 'galleryImage2', 'galleryImage3',
         'photo2', 'photo3', 'mapImage',
         'eventImage1', 'eventImage2', 'wellnessImage1', 'wellnessImage2',
-        'locationMapImage',
+        'locationMapImage', 'aboutImage1', 'aboutImage2', 'aboutImage3',
     ];
     $ids = [];
     $thumb_id = (int)get_post_thumbnail_id($post_id);

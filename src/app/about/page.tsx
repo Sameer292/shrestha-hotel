@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ImageCarousel from "@/components/common/ImageCarousel";
 import { getAboutPage, getFaqs, getHotelSettings } from "@/lib/wordpress/queries";
 
 export const metadata = { title: "About — Our Story" };
@@ -12,8 +13,12 @@ export default async function AboutPage() {
 	]);
 	const a = {
 		heading: page?.heading || "Hospitality,\nheld lightly",
+		description: page?.description || "",
 		body: page?.body || "",
-		image: page?.image ?? { url: "/placeholder.svg", alt: "About" },
+		images:
+			page?.carouselImages?.length ?? 0
+				? (page?.carouselImages ?? [])
+				: [{ url: "/placeholder.svg", alt: "About" }],
 	};
 	const faqCategory = page?.faqCategory || "About";
 	const pageFaqs = faqs.filter((f) => f.category === faqCategory);
@@ -28,26 +33,22 @@ export default async function AboutPage() {
 				</h1>
 				<div className="grid lg:grid-cols-12 gap-8 mt-8">
 					<div className="lg:col-span-6">
+						{!!a.description && (
+							<p className="font-display text-[19px] md:text-[21px] leading-[1.5] text-[var(--forest)] max-w-[46ch] whitespace-pre-line">
+								{a.description}
+							</p>
+						)}
 						{a.body.split(/\n\n+/).map((p, i) => (
 							<p
 								key={i}
-								className="text-[15px] leading-[1.8] text-[var(--muted)] mt-4 first:mt-0"
+								className="text-[15px] leading-[1.8] text-[var(--muted)] mt-4 max-w-[52ch]"
 							>
 								{p}
 							</p>
 						))}
 					</div>
 					<div className="lg:col-span-6">
-						<div className="relative aspect-[4/3] rounded-[20px] overflow-hidden">
-							<Image
-								src={a.image.url}
-								alt={a.image.alt}
-								fill
-								className="object-cover"
-								unoptimized
-								sizes="600px"
-							/>
-						</div>
+						<ImageCarousel images={a.images} label="About the hotel" />
 					</div>
 				</div>
 			</div>
