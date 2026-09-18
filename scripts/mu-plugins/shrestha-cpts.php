@@ -186,3 +186,47 @@ add_action('init', function () {
         'map_meta_cap' => true,
     ]);
 });
+
+// Self-heal media parented to auto-drafts.
+//
+// Uploads made from an "Add …" screen belong to that screen's auto-draft,
+// and WPGraphQL hides attachments of unpublished posts — so featured images
+// AND ACF image fields resolve to null (frontend placeholders) even though
+// wp-admin shows them as set. On save, re-attach such media to this post
+// when its current parent is a draft/auto-draft/trash. Direct $wpdb update:
+// no save_post recursion, no extra revisions. Attachments parented to other
+// published posts (or unattached) are left alone.
+add_action('save_post', function ($post_id) {
+    if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) return;
+    // ACF image-field meta keys (return_format array stores attachment ID).
+    $image_keys = [
+        'storyImage1', 'storyImage2', 'footerBackground', 'finalCtaImage',
+        'diningImage1', 'diningImage2',
+        'galleryImage1', 'galleryImage2', 'galleryImage3',
+    ];
+    $ids = [];
+    $thumb_id = (int)get_post_thumbnail_id($post_id);
+    if ($thumb_id) $ids[] = $thumb_id;
+    foreach ($image_keys as $k) {
+        $v = get_post_meta($post_id, $k, true);
+        if (is_numeric($v) && (int)$v > 0) $ids[] = (int)$v;
+    }
+    $ids = array_unique($ids);
+    if (!$ids) return;
+    global $wpdb;
+    foreach ($ids as $att_id) {
+        $parent = (int)$wpdb->get_var($wpdb->prepare(
+            "SELECT post_parent FROM $wpdb->posts WHERE ID = %d",
+            $att_id
+        ));
+        if ($parent === (int)$post_id || $parent === 0) continue;
+        $parent_status = $wpdb->get_var($wpdb->prepare(
+            "SELECT post_status FROM $wpdb->posts WHERE ID = %d",
+            $parent
+        ));
+        if (!in_array($parent_status, ['draft', 'auto-draft', 'trash'], true)) continue;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $wpdb->update($wpdb->posts, ['post_parent' => $post_id], ['ID' => $att_id]);
+        clean_post_cache($att_id);
+    }
+}, 20);
