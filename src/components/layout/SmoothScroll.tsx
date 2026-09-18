@@ -15,8 +15,8 @@ export default function SmoothScroll({
 		if (reduce) return;
 		registerGsap();
 		const lenis = new Lenis({
-			autoRaf: true,
-			lerp: 0.08,
+			autoRaf: false,
+			lerp: 0.2,
 			smoothWheel: true,
 			gestureOrientation: "vertical",
 		});

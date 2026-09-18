@@ -6,10 +6,10 @@ services:
     build:
       context: .
       args:
-        NEXT_PUBLIC_SITE_URL: https://www.shresthahotel.com
+        NEXT_PUBLIC_SITE_URL: https://shresthahotel.hashtagweb.com.np
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3000:3000" # loopback only — never expose Node publicly
+      - "127.0.0.1:3200:3200" # loopback only — never expose Node publicly
     environment:
-      WORDPRESS_API_URL: https://www.shresthahotel.com/graphql
+      WORDPRESS_API_URL: https://shresthahotel.hashtagweb.com.np/graphql
       REVALIDATE_SECRET: ${REVALIDATE_SECRET:?set in env}
