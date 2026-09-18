@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getAboutPage } from "@/lib/wordpress/queries";
+import { getAboutPage, getFaqs } from "@/lib/wordpress/queries";
 
 export const metadata = { title: "About — Our Story" };
 export const revalidate = 10;
@@ -11,7 +11,7 @@ const DEFAULT_STATS = [
 ];
 
 export default async function AboutPage() {
-	const page = await getAboutPage();
+	const [page, faqs] = await Promise.all([getAboutPage(), getFaqs()]);
 	const a = {
 		heading: page?.heading || "Hospitality,\nheld lightly",
 		body: page?.body || "",
@@ -20,6 +20,8 @@ export default async function AboutPage() {
 	const stats = page?.stats?.length
 		? page.stats.map((s) => ({ k: s.value, v: s.label }))
 		: DEFAULT_STATS;
+	const faqCategory = page?.faqCategory || "About";
+	const pageFaqs = faqs.filter((f) => f.category === faqCategory);
 	return (
 		<div className="pt-20">
 			<div className="container-outer pt-8 pb-10">
@@ -69,6 +71,64 @@ export default async function AboutPage() {
 					</div>
 				</div>
 			</div>
+			{(page?.sustainabilityHeading ||
+				page?.sustainabilityText ||
+				(page?.sustainabilityItems?.length ?? 0) > 0) && (
+				<div className="container-outer pb-12">
+					<div className="bg-[var(--cream-2)] border border-[var(--line)] rounded-[20px] p-6 md:p-10">
+						<p className="eyebrow text-[var(--moss)] mb-3">Sustainability</p>
+						{!!page?.sustainabilityHeading && (
+							<h2 className="display text-[28px] md:text-[36px] text-[var(--forest)] leading-none whitespace-pre-line">
+								{page.sustainabilityHeading}
+							</h2>
+						)}
+						{!!page?.sustainabilityText && (
+							<p className="text-[15px] leading-relaxed text-[var(--muted)] mt-4 max-w-[62ch] whitespace-pre-line">
+								{page.sustainabilityText}
+							</p>
+						)}
+						{(page?.sustainabilityItems?.length ?? 0) > 0 && (
+							<div className="grid sm:grid-cols-2 gap-4 mt-6">
+								{page?.sustainabilityItems?.map((item) => (
+									<div
+										key={item.title}
+										className="bg-white border border-[var(--line)] rounded-2xl p-5"
+									>
+										<h3 className="font-display text-lg text-[var(--forest)]">
+											{item.title}
+										</h3>
+										<p className="text-sm text-[var(--muted)] mt-2 leading-relaxed">
+											{item.text}
+										</p>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+				</div>
+			)}
+			{pageFaqs.length > 0 && (
+				<div className="container-outer pb-16 max-w-[760px]">
+					<h2 className="display text-[28px] md:text-[36px] text-[var(--forest)]">
+						Questions, answered
+					</h2>
+					<div className="mt-6 space-y-4">
+						{pageFaqs.map((f) => (
+							<div
+								key={f.question}
+								className="bg-white border border-[var(--line)] rounded-2xl p-5"
+							>
+								<p className="text-sm font-medium text-[var(--forest)]">
+									{f.question}
+								</p>
+								<p className="text-sm text-[var(--muted)] mt-1 leading-relaxed">
+									{f.answer}
+								</p>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
