@@ -34,10 +34,9 @@ export type Experience = {
 	description: string;
 	featuredImage: Media;
 	gallery: Media[];
-	duration?: string;
-	difficulty?: string;
-	season?: string;
-	price?: number;
+	paragraphs: string[];
+	activities: string[];
+	location?: string;
 	featured: boolean;
 };
 
@@ -85,6 +84,7 @@ export type HotelSettings = {
 	checkOut: string;
 	currency: string;
 	footerDescription: string;
+	logoUrl?: string;
 };
 
 // Home Content CPT entry (slug: home) — homepage + footer identity.
@@ -108,6 +108,7 @@ export type HomeEntry = {
 	footerBackground?: Media;
 	footerTagline: string;
 	footerSubtagline: string;
+	footerDescription: string;
 	finalCtaHeading: string;
 	finalCtaDescription: string;
 	finalCtaImage: Media;

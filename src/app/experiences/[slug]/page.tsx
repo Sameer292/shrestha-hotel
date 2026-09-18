@@ -60,26 +60,42 @@ export default async function ExperiencePage({
 					<h1 className="display text-[36px] md:text-[44px] text-[var(--forest)] mt-8 leading-none">
 						{ex.name}
 					</h1>
-					<p className="text-[15px] leading-relaxed text-[var(--muted)] mt-4 max-w-[60ch]">
-						{ex.description}
-					</p>
-					<div className="flex flex-wrap gap-2 mt-6">
-						{ex.duration && (
-							<span className="text-xs border border-[var(--line)] bg-white px-3 py-1.5 rounded-full">
-								{ex.duration}
-							</span>
-						)}
-						{ex.difficulty && (
-							<span className="text-xs border border-[var(--line)] bg-white px-3 py-1.5 rounded-full">
-								{ex.difficulty}
-							</span>
-						)}
-						{ex.season && (
-							<span className="text-xs border border-[var(--line)] bg-white px-3 py-1.5 rounded-full">
-								{ex.season}
-							</span>
-						)}
+					{ex.location && (
+						<p className="text-[13px] tracking-[0.14em] uppercase text-[var(--moss)] mt-3">
+							{ex.location}
+						</p>
+					)}
+					<div className="mt-4 max-w-[60ch] space-y-4">
+						{ex.paragraphs.map((p, i) => (
+							<p
+								key={i}
+								className="text-[15px] leading-relaxed text-[var(--muted)]"
+							>
+								{p}
+							</p>
+						))}
 					</div>
+					{ex.activities.length > 0 && (
+						<div className="mt-8">
+							<h2 className="font-display text-xl text-[var(--forest)]">
+								What you&apos;ll do
+							</h2>
+							<ul className="mt-3 space-y-2.5">
+								{ex.activities.map((a, i) => (
+									<li
+										key={i}
+										className="flex gap-3 text-[15px] leading-relaxed text-[var(--ink)]"
+									>
+										<span
+											aria-hidden
+											className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--gold)]"
+										/>
+										{a}
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
 				</div>
 				<aside className="lg:col-span-5">
 					<div className="bg-white border border-[var(--line)] rounded-[20px] p-6">
@@ -88,7 +104,7 @@ export default async function ExperiencePage({
 						</h3>
 						<p className="text-sm text-[var(--muted)] mt-2">
 							{page?.sidebarText ||
-								"Mention this experience when you book your stay — our team will arrange timing around weather and season."}
+								"Mention this experience when you book your stay — our team will arrange the details with you."}
 						</p>
 						<Link
 							href={page?.ctaUrl || "/booking"}

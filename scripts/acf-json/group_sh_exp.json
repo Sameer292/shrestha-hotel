@@ -2,10 +2,10 @@
   "key": "group_sh_exp",
   "title": "Experience Fields",
   "fields": [
-    {"key": "field_sh_exp_duration", "name": "duration", "label": "Duration", "type": "text"},
-    {"key": "field_sh_exp_difficulty", "name": "difficulty", "label": "Difficulty", "type": "text"},
-    {"key": "field_sh_exp_season", "name": "season", "label": "Season", "type": "text"},
-    {"key": "field_sh_exp_price", "name": "optionalPrice", "label": "Optional Price", "type": "number"},
+    {"key": "field_sh_exp_para2", "name": "paragraph2", "label": "Paragraph 2 (optional — shows below the main text)", "type": "textarea", "rows": 5},
+    {"key": "field_sh_exp_para3", "name": "paragraph3", "label": "Paragraph 3 (optional — shows last)", "type": "textarea", "rows": 5},
+    {"key": "field_sh_exp_activities", "name": "activities", "label": "Activities (optional — one per line, shown as a list)", "type": "textarea", "rows": 5},
+    {"key": "field_sh_exp_location", "name": "location", "label": "Meeting point / location (optional — shown as a badge)", "type": "text"},
     {"key": "field_sh_exp_featured", "name": "featured", "label": "Featured", "type": "true_false", "default_value": 0}
   ],
   "location": [[{"param": "post_type", "operator": "==", "value": "experience"}]],
