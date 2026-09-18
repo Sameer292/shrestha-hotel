@@ -216,6 +216,7 @@ export const mockExperiences: Experience[] = [
 		],
 		activities: ["Dawn bathing", "Open-air pools", "Private soaks"],
 		location: "Hotel hot spring",
+		photos: [],
 		featured: true,
 	},
 	{
@@ -231,6 +232,7 @@ export const mockExperiences: Experience[] = [
 		],
 		activities: ["Ridge viewpoints", "Village paths", "Forest loops"],
 		location: "Hotel gate",
+		photos: [],
 		featured: true,
 	},
 	{
@@ -246,6 +248,7 @@ export const mockExperiences: Experience[] = [
 		],
 		activities: ["Village walks", "Tea houses", "Local tastings"],
 		location: "Nearby villages",
+		photos: [],
 		featured: true,
 	},
 	{
@@ -261,6 +264,7 @@ export const mockExperiences: Experience[] = [
 		],
 		activities: [],
 		location: "Riverside",
+		photos: [],
 		featured: false,
 	},
 	{
@@ -276,6 +280,7 @@ export const mockExperiences: Experience[] = [
 		],
 		activities: ["Bonfire", "Music", "Evening tea"],
 		location: "Hotel courtyard",
+		photos: [],
 		featured: true,
 	},
 	{
@@ -291,6 +296,7 @@ export const mockExperiences: Experience[] = [
 		],
 		activities: ["Sunrise viewpoints", "Photography stops"],
 		location: "Viewpoints",
+		photos: [],
 		featured: false,
 	},
 ];

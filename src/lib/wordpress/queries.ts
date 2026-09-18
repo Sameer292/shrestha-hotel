@@ -11,6 +11,7 @@ import type {
 	AboutPage,
 	ContactPage,
 	DiningPage,
+	EventsPage,
 	Experience,
 	ExperiencesPage,
 	FAQ,
@@ -22,6 +23,7 @@ import type {
 	Room,
 	StayPage,
 	Testimonial,
+	WellnessPage,
 } from "./types";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -88,6 +90,10 @@ type WPExperienceFields = {
 	paragraph3?: string | null;
 	activities?: string | null;
 	location?: string | null;
+	photo2?: WPImage | null;
+	photo3?: WPImage | null;
+	mapimage?: WPImage | null;
+	mapurl?: string | null;
 	featured?: boolean | null;
 };
 
@@ -175,6 +181,9 @@ function mapExperience(
 		.split("\n")
 		.map((a) => a.trim().replace(/^[-•\s]+/, ""))
 		.filter(Boolean);
+	const photos = wpImages([f?.photo2, f?.photo3], name);
+	const mapImg = singleImage(f?.mapimage, name);
+	const mapUrl = clean(f?.mapurl);
 	return {
 		slug: n.slug,
 		name,
@@ -185,6 +194,8 @@ function mapExperience(
 		paragraphs: paras,
 		activities,
 		location: clean(f?.location) || undefined,
+		photos,
+		map: mapImg ? { image: mapImg, url: mapUrl || undefined } : undefined,
 		featured: f?.featured ?? false,
 	};
 }
@@ -235,6 +246,7 @@ type WPPageFields = {
 	cta?: string | null;
 	teaserheading?: string | null;
 	teasertext?: string | null;
+	teasercta?: string | null;
 	teaserctaurl?: string | null;
 	images?: { sourceUrl: string; altText: string }[] | null;
 	storyeyebrow?: string | null;
@@ -265,6 +277,17 @@ type WPPageFields = {
 	finalctasecondaryctaurl?: string | null;
 	diningimage1?: WPImage | null;
 	diningimage2?: WPImage | null;
+	sustainabilityheading?: string | null;
+	sustainabilitytext?: string | null;
+	sustainabilityitems?: string | null;
+	eventimage1?: WPImage | null;
+	eventimage2?: WPImage | null;
+	eventcards?: string | null;
+	featuresheading?: string | null;
+	featureslist?: string | null;
+	wellnessimage1?: WPImage | null;
+	wellnessimage2?: WPImage | null;
+	practicecards?: string | null;
 };
 
 type WPPageNode<F extends string> = {
@@ -537,6 +560,79 @@ export async function getDiningPage(): Promise<DiningPage | null> {
 	};
 }
 
+const EVENTS_PAGE_FIELDS = `
+	slug title excerpt content
+	featuredImage { node { sourceUrl altText } }
+	eventsPageFields {
+		heroeyebrow heading subheading teaserheading teasertext
+		eventimage1 { sourceUrl altText } eventimage2 { sourceUrl altText }
+		teasercta teaserctaurl eventcards featuresheading featureslist
+	}
+`;
+
+export async function getEventsPage(): Promise<EventsPage | null> {
+	const data = await wpFetch<{
+		eventsPages: { nodes: WPPageNode<"eventsPageFields">[] };
+	}>(`query { eventsPages(first: 1) { nodes { ${EVENTS_PAGE_FIELDS} } } }`);
+	const n = data?.eventsPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.eventsPageFields;
+	const images = wpImages([f?.eventimage1, f?.eventimage2], n.title);
+	return {
+		eyebrow: f?.heroeyebrow || "Events",
+		heading: f?.heading || "",
+		subheading: f?.subheading || clean(n.content),
+		teaserHeading: f?.teaserheading || f?.heading || "",
+		teaserText: f?.teasertext || clean(n.excerpt),
+		images:
+			images.length >= 2
+				? images
+				: [...images, ...Array(2 - images.length).fill(placeholder(n.title))],
+		teaserCta: f?.teasercta || "Explore Events",
+		teaserCtaUrl: f?.teaserctaurl || "/events",
+		cards: parseCardLines(f?.eventcards),
+		featuresHeading: clean(f?.featuresheading),
+		features: (f?.featureslist ?? "")
+			.split(/\r?\n/)
+			.map((l) => l.trim())
+			.filter(Boolean),
+	};
+}
+
+const WELLNESS_PAGE_FIELDS = `
+	slug title excerpt content
+	featuredImage { node { sourceUrl altText } }
+	wellnessPageFields {
+		heroeyebrow heading subheading teaserheading teasertext
+		wellnessimage1 { sourceUrl altText } wellnessimage2 { sourceUrl altText }
+		teasercta teaserctaurl practicecards
+	}
+`;
+
+export async function getWellnessPage(): Promise<WellnessPage | null> {
+	const data = await wpFetch<{
+		wellnessPages: { nodes: WPPageNode<"wellnessPageFields">[] };
+	}>(`query { wellnessPages(first: 1) { nodes { ${WELLNESS_PAGE_FIELDS} } } }`);
+	const n = data?.wellnessPages?.nodes?.[0];
+	if (!n) return null;
+	const f = n.wellnessPageFields;
+	const images = wpImages([f?.wellnessimage1, f?.wellnessimage2], n.title);
+	return {
+		eyebrow: f?.heroeyebrow || "Wellness",
+		heading: f?.heading || "",
+		subheading: f?.subheading || clean(n.content),
+		teaserHeading: f?.teaserheading || f?.heading || "",
+		teaserText: f?.teasertext || clean(n.excerpt),
+		images:
+			images.length >= 2
+				? images
+				: [...images, ...Array(2 - images.length).fill(placeholder(n.title))],
+		teaserCta: f?.teasercta || "Explore Wellness",
+		teaserCtaUrl: f?.teaserctaurl || "/wellness",
+		cards: parseCardLines(f?.practicecards),
+	};
+}
+
 const GALLERY_PAGE_FIELDS = `
 	slug title excerpt content
 	galleryPageFields { heroeyebrow heading subheading }
@@ -559,7 +655,10 @@ export async function getGalleryPage(): Promise<GalleryPage | null> {
 const ABOUT_PAGE_FIELDS = `
 	slug title excerpt content
 	featuredImage { node { sourceUrl altText } }
-	aboutPageFields { heroeyebrow heading stats }
+	aboutPageFields {
+		heroeyebrow heading stats
+		sustainabilityheading sustainabilitytext sustainabilityitems faqcategory
+	}
 `;
 
 export async function getAboutPage(): Promise<AboutPage | null> {
@@ -575,6 +674,10 @@ export async function getAboutPage(): Promise<AboutPage | null> {
 		body: clean(n.content),
 		image: pageImage(n),
 		stats: parseStatLines(f?.stats),
+		sustainabilityHeading: clean(f?.sustainabilityheading),
+		sustainabilityText: clean(f?.sustainabilitytext),
+		sustainabilityItems: parseCardLines(f?.sustainabilityitems),
+		faqCategory: clean(f?.faqcategory) || "About",
 	};
 }
 
@@ -646,7 +749,9 @@ export async function getExperiences(): Promise<Experience[]> {
 					slug title excerpt content
 					featuredImage { node { sourceUrl altText } }
 					experienceFields {
-						paragraph2 paragraph3 activities location featured
+						paragraph2 paragraph3 activities location
+						photo2 { sourceUrl altText } photo3 { sourceUrl altText }
+						mapimage { sourceUrl altText } mapurl featured
 					}
 				}
 			}

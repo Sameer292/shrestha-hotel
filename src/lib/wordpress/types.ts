@@ -37,6 +37,8 @@ export type Experience = {
 	paragraphs: string[];
 	activities: string[];
 	location?: string;
+	photos: Media[];
+	map?: { image: Media; url?: string };
 	featured: boolean;
 };
 
@@ -187,6 +189,36 @@ export type AboutPage = {
 	body: string;
 	image: Media;
 	stats: { value: string; label: string }[];
+	sustainabilityHeading: string;
+	sustainabilityText: string;
+	sustainabilityItems: { title: string; text: string }[];
+	faqCategory: string;
+};
+
+export type EventsPage = {
+	eyebrow: string;
+	heading: string;
+	subheading: string;
+	teaserHeading: string;
+	teaserText: string;
+	images: Media[];
+	teaserCta: string;
+	teaserCtaUrl: string;
+	cards: { title: string; text: string }[];
+	featuresHeading: string;
+	features: string[];
+};
+
+export type WellnessPage = {
+	eyebrow: string;
+	heading: string;
+	subheading: string;
+	teaserHeading: string;
+	teaserText: string;
+	images: Media[];
+	teaserCta: string;
+	teaserCtaUrl: string;
+	cards: { title: string; text: string }[];
 };
 
 export type ContactPage = {

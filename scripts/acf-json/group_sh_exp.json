@@ -6,6 +6,10 @@
     {"key": "field_sh_exp_para3", "name": "paragraph3", "label": "Paragraph 3 (optional — shows last)", "type": "textarea", "rows": 5},
     {"key": "field_sh_exp_activities", "name": "activities", "label": "Activities (optional — one per line, shown as a list)", "type": "textarea", "rows": 5},
     {"key": "field_sh_exp_location", "name": "location", "label": "Meeting point / location (optional — shown as a badge)", "type": "text"},
+    {"key": "field_sh_exp_photo2", "name": "photo2", "label": "Extra photo 2 (optional — shows in the photo strip)", "type": "image", "required": 0, "return_format": "array", "preview_size": "medium", "library": "all", "mime_types": ""},
+    {"key": "field_sh_exp_photo3", "name": "photo3", "label": "Extra photo 3 (optional — shows in the photo strip)", "type": "image", "required": 0, "return_format": "array", "preview_size": "medium", "library": "all", "mime_types": ""},
+    {"key": "field_sh_exp_mapImage", "name": "mapImage", "label": "Route / location map image (optional)", "type": "image", "required": 0, "return_format": "array", "preview_size": "medium", "library": "all", "mime_types": ""},
+    {"key": "field_sh_exp_mapUrl", "name": "mapUrl", "label": "Larger map link (optional — button under the map)", "type": "text"},
     {"key": "field_sh_exp_featured", "name": "featured", "label": "Featured", "type": "true_false", "default_value": 0}
   ],
   "location": [[{"param": "post_type", "operator": "==", "value": "experience"}]],
