@@ -347,6 +347,29 @@ function parseCardLines(raw: string | null | undefined): { title: string; text: 
 		.filter((c) => c.title || c.text);
 }
 
+// Wellness practice cards: "Title | text | benefit1; benefit2" per line.
+// Benefits are optional; plain "Title | text" lines still work.
+function parseWellnessCards(
+	raw: string | null | undefined,
+): { title: string; text: string; benefits: string[] }[] {
+	if (!raw) return [];
+	return raw
+		.split(/\r?\n/)
+		.map((l) => l.trim())
+		.filter(Boolean)
+		.map((l) => {
+			const [title, ...rest] = l.split("|");
+			const [text, ...benefitParts] = rest.join("|").split("|");
+			const benefits = benefitParts
+				.join("|")
+				.split(";")
+				.map((b) => b.trim())
+				.filter(Boolean);
+			return { title: title.trim(), text: (text ?? "").trim(), benefits };
+		})
+		.filter((c) => c.title || c.text);
+}
+
 function parseLineList(raw: string | null | undefined): string[] {
 	if (!raw) return [];
 	return raw
@@ -629,7 +652,7 @@ export async function getWellnessPage(): Promise<WellnessPage | null> {
 				: [...images, ...Array(2 - images.length).fill(placeholder(n.title))],
 		teaserCta: f?.teasercta || "Explore Wellness",
 		teaserCtaUrl: f?.teaserctaurl || "/wellness",
-		cards: parseCardLines(f?.practicecards),
+		cards: parseWellnessCards(f?.practicecards),
 	};
 }
 

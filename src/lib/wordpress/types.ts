@@ -218,7 +218,7 @@ export type WellnessPage = {
 	images: Media[];
 	teaserCta: string;
 	teaserCtaUrl: string;
-	cards: { title: string; text: string }[];
+	cards: { title: string; text: string; benefits: string[] }[];
 };
 
 export type ContactPage = {

@@ -63,6 +63,22 @@ export default async function WellnessPage() {
 							<p className="text-sm text-[var(--muted)] mt-2 leading-relaxed">
 								{c.text}
 							</p>
+							{c.benefits.length > 0 && (
+								<ul className="mt-3 space-y-1.5 border-t border-[var(--line)] pt-3">
+									{c.benefits.map((b, i) => (
+										<li
+											key={i}
+											className="flex gap-2.5 text-sm leading-relaxed text-[var(--ink)]"
+										>
+											<span
+												aria-hidden
+												className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--gold)]"
+											/>
+											{b}
+										</li>
+									))}
+								</ul>
+							)}
 						</div>
 					))}
 				</div>

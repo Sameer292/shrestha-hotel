@@ -11,7 +11,7 @@
     {"key": "field_sh_wpg_image2", "name": "wellnessImage2", "label": "Page photo 2", "type": "image", "required": 0, "return_format": "array", "preview_size": "medium", "library": "all", "mime_types": ""},
     {"key": "field_sh_wpg_cta", "name": "teaserCta", "label": "Homepage teaser button", "type": "text"},
     {"key": "field_sh_wpg_ctaUrl", "name": "teaserCtaUrl", "label": "Homepage teaser button URL", "type": "text"},
-    {"key": "field_sh_wpg_cards", "name": "practiceCards", "label": "Practice cards (one Title | text per line — e.g. Yoga | Sunrise sessions…)", "type": "textarea", "rows": 8}
+    {"key": "field_sh_wpg_cards", "name": "practiceCards", "label": "Practice cards (one per line: Title | text | benefit1; benefit2 — benefits optional)", "type": "textarea", "rows": 8}
   ],
   "location": [[{"param": "post_type", "operator": "==", "value": "wellness_page"}]],
   "menu_order": 0,
