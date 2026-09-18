@@ -62,6 +62,18 @@ add_action('init', function () {
             'graphql_plural_name' => 'diningPages',
             'menu_icon' => 'dashicons-heart',
         ],
+        'events_page' => [
+            'label' => 'Events Page',
+            'graphql_single_name' => 'eventsPage',
+            'graphql_plural_name' => 'eventsPages',
+            'menu_icon' => 'dashicons-groups',
+        ],
+        'wellness_page' => [
+            'label' => 'Wellness Page',
+            'graphql_single_name' => 'wellnessPage',
+            'graphql_plural_name' => 'wellnessPages',
+            'menu_icon' => 'dashicons-heart',
+        ],
         'gallery_page' => [
             'label' => 'Gallery Page',
             'graphql_single_name' => 'galleryPage',
@@ -203,6 +215,9 @@ add_action('save_post', function ($post_id) {
         'storyImage1', 'storyImage2', 'footerBackground', 'finalCtaImage',
         'diningImage1', 'diningImage2',
         'galleryImage1', 'galleryImage2', 'galleryImage3',
+        'photo2', 'photo3', 'mapImage',
+        'eventImage1', 'eventImage2', 'wellnessImage1', 'wellnessImage2',
+        'locationMapImage', 'aboutImage1', 'aboutImage2', 'aboutImage3',
     ];
     $ids = [];
     $thumb_id = (int)get_post_thumbnail_id($post_id);

@@ -133,10 +133,18 @@ export default function Footer({
 							</li>
 							<li>
 								<Link
-									href="/dining"
+									href="/events"
 									className="hover:opacity-100 hover:underline underline-offset-4"
 								>
-									Dining
+									Events
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/wellness"
+									className="hover:opacity-100 hover:underline underline-offset-4"
+								>
+									Wellness
 								</Link>
 							</li>
 							<li>

@@ -57,6 +57,25 @@ export default async function ExperiencePage({
 							sizes="800px"
 						/>
 					</div>
+					{ex.photos.length > 0 && (
+						<div className="mt-4 flex gap-3 overflow-x-auto pb-2 snap-x">
+							{ex.photos.map((p, i) => (
+								<div
+									key={i}
+									className="relative w-56 md:w-72 aspect-[4/3] shrink-0 snap-start overflow-hidden rounded-[16px]"
+								>
+									<Image
+										src={p.url}
+										alt={p.alt}
+										fill
+										className="object-cover"
+										unoptimized
+										sizes="300px"
+									/>
+								</div>
+							))}
+						</div>
+					)}
 					<h1 className="display text-[36px] md:text-[44px] text-[var(--forest)] mt-8 leading-none">
 						{ex.name}
 					</h1>
@@ -94,6 +113,33 @@ export default async function ExperiencePage({
 									</li>
 								))}
 							</ul>
+						</div>
+					)}
+					{ex.map && (
+						<div className="mt-8">
+							<h2 className="font-display text-xl text-[var(--forest)]">
+								Getting there
+							</h2>
+							<div className="relative aspect-[16/9] rounded-[16px] overflow-hidden mt-3">
+								<Image
+									src={ex.map.image.url}
+									alt={ex.map.image.alt}
+									fill
+									className="object-cover"
+									unoptimized
+									sizes="700px"
+								/>
+							</div>
+							{ex.map.url && (
+								<a
+									href={ex.map.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="mt-3 inline-block text-sm border-b border-[var(--forest)] pb-1"
+								>
+									View larger map →
+								</a>
+							)}
 						</div>
 					)}
 				</div>

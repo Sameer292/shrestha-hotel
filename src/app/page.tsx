@@ -9,7 +9,7 @@ import Intro from "@/components/home/Intro";
 import Location from "@/components/home/Location";
 import Testimonials from "@/components/home/Testimonials";
 import {
-	getDiningPage,
+	getEventsPage,
 	getExperiences,
 	getFeaturedRooms,
 	getGallery,
@@ -17,12 +17,13 @@ import {
 	getHotSpringPage,
 	getHotelSettings,
 	getTestimonials,
+	getWellnessPage,
 } from "@/lib/wordpress/queries";
 
 export const revalidate = 10;
 
 export default async function Home() {
-	const [home, rooms, experiences, testimonials, gallery, settings, hs, dining] =
+	const [home, rooms, experiences, testimonials, gallery, settings, hs, events, wellness] =
 		await Promise.all([
 			getHomeEntry(),
 			getFeaturedRooms(),
@@ -31,7 +32,8 @@ export default async function Home() {
 			getGallery(),
 			getHotelSettings(),
 			getHotSpringPage(),
-			getDiningPage(),
+			getEventsPage(),
+			getWellnessPage(),
 		]);
 
 	return (
@@ -79,18 +81,34 @@ export default async function Home() {
 			<FeaturedRooms rooms={rooms} />
 			<Experiences items={experiences.slice(0, 3)} />
 			<DiningPreview
-				heading={dining?.teaserHeading || ""}
-				text={dining?.teaserText || ""}
+				eyebrow={events?.eyebrow || "Events"}
+				heading={events?.teaserHeading || ""}
+				text={events?.teaserText || ""}
 				images={
-					dining?.images?.length
-						? dining.images
+					events?.images?.length
+						? events.images
 						: [
-								{ url: "/placeholder.svg", alt: "Dining" },
-								{ url: "/placeholder.svg", alt: "Dining" },
+								{ url: "/placeholder.svg", alt: "Events" },
+								{ url: "/placeholder.svg", alt: "Events" },
 							]
 				}
-				cta={dining?.teaserCta}
-				ctaUrl={dining?.teaserCtaUrl}
+				cta={events?.teaserCta || "Explore Events"}
+				ctaUrl={events?.teaserCtaUrl || "/events"}
+			/>
+			<DiningPreview
+				eyebrow={wellness?.eyebrow || "Wellness"}
+				heading={wellness?.teaserHeading || ""}
+				text={wellness?.teaserText || ""}
+				images={
+					wellness?.images?.length
+						? wellness.images
+						: [
+								{ url: "/placeholder.svg", alt: "Wellness" },
+								{ url: "/placeholder.svg", alt: "Wellness" },
+							]
+				}
+				cta={wellness?.teaserCta || "Explore Wellness"}
+				ctaUrl={wellness?.teaserCtaUrl || "/wellness"}
 			/>
 			<GalleryPreview items={gallery} />
 			<Testimonials items={testimonials} />

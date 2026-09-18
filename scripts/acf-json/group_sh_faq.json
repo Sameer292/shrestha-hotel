@@ -2,10 +2,8 @@
   "key": "group_sh_faq",
   "title": "FAQ Fields",
   "fields": [
-    {"key": "field_sh_faq_question", "name": "question", "label": "Question", "type": "text"},
-    {"key": "field_sh_faq_answer", "name": "answer", "label": "Answer", "type": "textarea", "rows": 4},
-    {"key": "field_sh_faq_cat", "name": "category", "label": "Category", "type": "text"},
-    {"key": "field_sh_faq_order", "name": "displayOrder", "label": "Display Order", "type": "number"}
+    {"key": "field_sh_faq_cat", "name": "category", "label": "Shows on page", "type": "select", "choices": {"About": "About page", "Hot Spring": "Hot Spring page"}, "default_value": "About"},
+    {"key": "field_sh_faq_order", "name": "displayOrder", "label": "Display order (optional — lowest first)", "type": "number"}
   ],
   "location": [[{"param": "post_type", "operator": "==", "value": "faq"}]],
   "menu_order": 0,

@@ -29,10 +29,11 @@ add_action('admin_menu', function () {
         ['sh-stay', 'Stay Page', 'stay_page', 'stay', 'Stay', 'dashicons-building', 32],
         ['sh-hot-spring', 'Hot Spring Page', 'hot_spring_page', 'hot-spring', 'Hot Spring', 'dashicons-palmtree', 33],
         ['sh-experiences', 'Experiences Page', 'experiences_page', 'experiences', 'Experiences', 'dashicons-camera', 34],
-        ['sh-dining', 'Dining Page', 'dining_page', 'dining', 'Dining', 'dashicons-heart', 35],
-        ['sh-gallery', 'Gallery Page', 'gallery_page', 'gallery', 'Gallery', 'dashicons-format-gallery', 36],
-        ['sh-about', 'About Page', 'about_page', 'about', 'About', 'dashicons-info', 37],
-        ['sh-contact', 'Contact Page', 'contact_page', 'contact', 'Contact', 'dashicons-email', 38],
+        ['sh-events', 'Events Page', 'events_page', 'events', 'Events', 'dashicons-groups', 35],
+        ['sh-wellness', 'Wellness Page', 'wellness_page', 'wellness', 'Wellness', 'dashicons-heart', 36],
+        ['sh-gallery', 'Gallery Page', 'gallery_page', 'gallery', 'Gallery', 'dashicons-format-gallery', 37],
+        ['sh-about', 'About Page', 'about_page', 'about', 'About', 'dashicons-info', 38],
+        ['sh-contact', 'Contact Page', 'contact_page', 'contact', 'Contact', 'dashicons-email', 39],
     ];
     foreach ($menus as [$menu_slug, $label, $type, $slug, $title, $icon, $pos]) {
         // Redirect on the load-* hook (before any admin output), NOT in
