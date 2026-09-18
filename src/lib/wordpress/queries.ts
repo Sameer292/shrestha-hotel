@@ -112,8 +112,6 @@ type WPGalleryItemFields = {
 };
 
 type WPFAQFields = {
-	question?: string | null;
-	answer?: string | null;
 	category?: string | null;
 	displayorder?: number | null;
 };
@@ -898,8 +896,8 @@ export async function getFaqs(): Promise<FAQ[]> {
 		`query {
 			faqs(first: 200, where: { status: PUBLISH }) {
 				nodes {
-					slug title excerpt content
-					faqFields { question answer category displayorder }
+					slug title content
+					faqFields { category displayorder }
 				}
 			}
 		}`,
@@ -911,8 +909,8 @@ export async function getFaqs(): Promise<FAQ[]> {
 		.map((n, i) => {
 			const f = n.faqFields;
 			return {
-				question: f?.question || clean(n.title),
-				answer: f?.answer || clean(n.content),
+				question: clean(n.title),
+				answer: clean(n.content),
 				category: f?.category || "General",
 				displayOrder: f?.displayorder ?? i,
 			};
