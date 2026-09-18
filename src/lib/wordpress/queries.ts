@@ -257,6 +257,7 @@ type WPPageFields = {
 	storystats?: string | null;
 	locationheading?: string | null;
 	locationtext?: string | null;
+	locationmapimage?: WPImage | null;
 	hotelname?: string | null;
 	tagline?: string | null;
 	subtagline?: string | null;
@@ -280,6 +281,8 @@ type WPPageFields = {
 	sustainabilityheading?: string | null;
 	sustainabilitytext?: string | null;
 	sustainabilityitems?: string | null;
+	facilitieslist?: string | null;
+	serviceslist?: string | null;
 	eventimage1?: WPImage | null;
 	eventimage2?: WPImage | null;
 	eventcards?: string | null;
@@ -679,7 +682,9 @@ const ABOUT_PAGE_FIELDS = `
 	slug title excerpt content
 	featuredImage { node { sourceUrl altText } }
 	aboutPageFields {
-		heroeyebrow heading stats
+		heroeyebrow heading
+		facilitieslist serviceslist
+		locationheading locationtext locationmapimage { sourceUrl altText }
 		sustainabilityheading sustainabilitytext sustainabilityitems faqcategory
 	}
 `;
@@ -696,7 +701,11 @@ export async function getAboutPage(): Promise<AboutPage | null> {
 		heading: f?.heading || n.title,
 		body: clean(n.content),
 		image: pageImage(n),
-		stats: parseStatLines(f?.stats),
+		facilities: parseCardLines(f?.facilitieslist),
+		services: parseCardLines(f?.serviceslist),
+		locationHeading: clean(f?.locationheading),
+		locationText: clean(f?.locationtext),
+		locationMapImage: singleImage(f?.locationmapimage, n.title) ?? undefined,
 		sustainabilityHeading: clean(f?.sustainabilityheading),
 		sustainabilityText: clean(f?.sustainabilitytext),
 		sustainabilityItems: parseCardLines(f?.sustainabilityitems),

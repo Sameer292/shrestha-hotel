@@ -4,7 +4,11 @@
   "fields": [
     {"key": "field_sh_apg_eyebrow", "name": "heroEyebrow", "label": "Hero eyebrow", "type": "text"},
     {"key": "field_sh_apg_heading", "name": "heading", "label": "Page heading", "type": "textarea", "rows": 2},
-    {"key": "field_sh_apg_stats", "name": "stats", "label": "Stat cards (one value | label per line)", "type": "textarea", "rows": 4},
+    {"key": "field_sh_apg_facilities", "name": "facilitiesList", "label": "Facilities (one Title | text per line — rooms, balconies, hot spring, restaurant…)", "type": "textarea", "rows": 6},
+    {"key": "field_sh_apg_services", "name": "servicesList", "label": "Services (one Title | text per line — tour help, transport, laundry…)", "type": "textarea", "rows": 6},
+    {"key": "field_sh_apg_locHeading", "name": "locationHeading", "label": "Location heading", "type": "text"},
+    {"key": "field_sh_apg_locText", "name": "locationText", "label": "Location details paragraph", "type": "textarea", "rows": 4},
+    {"key": "field_sh_apg_locMap", "name": "locationMapImage", "label": "Location map image (optional — screenshot or illustrated map)", "type": "image", "required": 0, "return_format": "array", "preview_size": "medium", "library": "all", "mime_types": ""},
     {"key": "field_sh_apg_susHeading", "name": "sustainabilityHeading", "label": "Sustainability heading", "type": "text"},
     {"key": "field_sh_apg_susText", "name": "sustainabilityText", "label": "Sustainability intro paragraph", "type": "textarea", "rows": 4},
     {"key": "field_sh_apg_susItems", "name": "sustainabilityItems", "label": "Sustainability practices (one Title | text per line — plastics, solar, organic, food-waste…)", "type": "textarea", "rows": 6},

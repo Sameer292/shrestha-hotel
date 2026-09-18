@@ -188,7 +188,11 @@ export type AboutPage = {
 	heading: string;
 	body: string;
 	image: Media;
-	stats: { value: string; label: string }[];
+	facilities: { title: string; text: string }[];
+	services: { title: string; text: string }[];
+	locationHeading: string;
+	locationText: string;
+	locationMapImage?: Media;
 	sustainabilityHeading: string;
 	sustainabilityText: string;
 	sustainabilityItems: { title: string; text: string }[];
