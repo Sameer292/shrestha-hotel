@@ -12,6 +12,7 @@ export default function Footer({
 		background?: { url: string; alt: string };
 		tagline?: string;
 		subtagline?: string;
+		description?: string;
 	};
 }) {
 	const s = settings ?? mockSettings;
@@ -38,17 +39,40 @@ export default function Footer({
 				<div className="grid md:grid-cols-12 gap-10">
 					<div className="md:col-span-5">
 						<div className="flex items-center gap-3">
-							<span className="w-8 h-8 rounded-full bg-white/10 border border-white/15 grid place-items-center text-[11px] tracking-[0.15em]">
-								SH
-							</span>
-							<span className="leading-none">
-								<span className="block font-display text-lg">
-									{s.hotelName}
-								</span>
-								<span className="block text-[10px] tracking-[0.22em] uppercase opacity-60">
-									{tagline}
-								</span>
-							</span>
+							{s.logoUrl ? (
+								<>
+									<Image
+										src={s.logoUrl}
+										alt={s.hotelName}
+										width={180}
+										height={44}
+										className="h-10 w-auto object-contain"
+										unoptimized
+									/>
+									<span className="leading-none">
+										<span className="block font-display text-lg">
+											{s.hotelName}
+										</span>
+										<span className="block text-[10px] tracking-[0.22em] uppercase opacity-60">
+											{tagline}
+										</span>
+									</span>
+								</>
+							) : (
+								<>
+									<span className="w-8 h-8 rounded-full bg-white/10 border border-white/15 grid place-items-center text-[11px] tracking-[0.15em]">
+										SH
+									</span>
+									<span className="leading-none">
+										<span className="block font-display text-lg">
+											{s.hotelName}
+										</span>
+										<span className="block text-[10px] tracking-[0.22em] uppercase opacity-60">
+											{tagline}
+										</span>
+									</span>
+								</>
+							)}
 						</div>
 						{subtagline && (
 							<p className="text-sm leading-relaxed opacity-70 mt-5 max-w-[36ch]">
@@ -56,7 +80,7 @@ export default function Footer({
 							</p>
 						)}
 						<p className="text-sm leading-relaxed opacity-70 mt-5 max-w-[36ch]">
-							{s.footerDescription}
+							{footer?.description || s.footerDescription}
 						</p>
 						<div className="flex gap-3 mt-6 text-sm">
 							<a

@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import { mockSettings } from "@/lib/wordpress/mock";
-import { getHomeEntry, getHotelSettings } from "@/lib/wordpress/queries";
+import { getHomeEntry, getHotelSettings, wpMedia } from "@/lib/wordpress/queries";
 
 const display = Cormorant_Garamond({
 	subsets: ["latin"],
@@ -48,7 +48,11 @@ export default async function RootLayout({
 		getHotelSettings(),
 		getHomeEntry(),
 	]);
-	const s = { ...mockSettings, ...settings };
+	const s = {
+		...mockSettings,
+		...settings,
+		logoUrl: settings?.logoUrl ? wpMedia(settings.logoUrl) : "",
+	};
 	return (
 		<html
 			lang="en"
@@ -61,6 +65,7 @@ export default async function RootLayout({
 						hotelName={s.hotelName}
 						phone={s.phone}
 						email={s.email}
+						logoUrl={s.logoUrl}
 					/>
 					<main className="flex-1">{children}</main>
 					<Footer
@@ -69,6 +74,7 @@ export default async function RootLayout({
 							background: home?.footerBackground,
 							tagline: home?.footerTagline || undefined,
 							subtagline: home?.footerSubtagline || undefined,
+							description: home?.footerDescription || undefined,
 						}}
 					/>
 				</SmoothScroll>

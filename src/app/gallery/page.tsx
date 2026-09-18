@@ -40,6 +40,11 @@ export default function GalleryPage() {
 				<h1 className="display text-[40px] md:text-[52px] text-[var(--forest)] leading-none mt-2 whitespace-pre-line">
 					{page?.heading || "A place in pictures"}
 				</h1>
+				{page?.subheading && (
+					<p className="text-[15px] md:text-base leading-relaxed text-[var(--muted)] mt-4 max-w-[62ch] whitespace-pre-line">
+						{page.subheading}
+					</p>
+				)}
 				<div className="flex flex-wrap gap-2 mt-6">
 					{cats.map((c) => (
 						<button
