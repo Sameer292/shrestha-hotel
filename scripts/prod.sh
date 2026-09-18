@@ -16,13 +16,13 @@ fi
 echo "==> Building + starting app..."
 $COMPOSE up -d --build
 
-echo "==> Waiting for http://127.0.0.1:3000 ..."
+echo "==> Waiting for http://127.0.0.1:3200 ..."
 ok=0
 for _ in $(seq 1 60); do
-	if curl -sf http://127.0.0.1:3000/ >/dev/null 2>&1; then ok=1; break; fi
+	if curl -sf http://127.0.0.1:3200/ >/dev/null 2>&1; then ok=1; break; fi
 	sleep 2
 done
 [ "$ok" = 1 ] || { echo "✗ app didn't answer — see: $COMPOSE logs app"; exit 1; }
 
-echo "✓ live: https://www.shresthahotel.com (via Hestia nginx → 127.0.0.1:3000)"
+echo "✓ live: https://shresthahotel.hashtagweb.com.np (via Hestia nginx → 127.0.0.1:3200)"
 $COMPOSE ps

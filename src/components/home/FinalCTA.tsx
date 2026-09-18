@@ -31,7 +31,7 @@ export default function FinalCTA({
 				/>
 				<div className="absolute inset-0 bg-[var(--gold)]/70" />
 			</div>
-			<div className="relative z-10 container-outer py-20 md:py-28 text-center text-white">
+			<div className="relative z-10 container-outer py-28 md:py-40 text-center text-white">
 				<h2 className="display text-[36px] md:text-[52px] max-w-[12ch] mx-auto leading-none">
 					{heading}
 				</h2>

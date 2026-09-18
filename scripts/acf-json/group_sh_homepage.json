@@ -21,6 +21,7 @@
     {"key": "field_sh_hp_footerBackground", "name": "footerBackground", "label": "Footer background photo (optional)", "type": "image", "required": 0, "return_format": "array", "preview_size": "medium", "library": "all", "mime_types": ""},
     {"key": "field_sh_hp_footerTagline", "name": "footerTagline", "label": "Footer tagline (empty = tagline above)", "type": "text"},
     {"key": "field_sh_hp_footerSubtagline", "name": "footerSubtagline", "label": "Footer sub-tagline (empty = sub-tagline above)", "type": "text"},
+    {"key": "field_sh_hp_footerDescription", "name": "footerDescription", "label": "Footer description paragraph (empty = Hotel Content default)", "type": "textarea", "rows": 4},
     {"key": "field_sh_hp_finalCtaHeading", "name": "finalCtaHeading", "label": "Final CTA heading", "type": "text"},
     {"key": "field_sh_hp_finalCtaDescription", "name": "finalCtaDescription", "label": "Final CTA description", "type": "textarea", "rows": 3},
     {"key": "field_sh_hp_finalCtaImage", "name": "finalCtaImage", "label": "Final CTA background (optional)", "type": "image", "required": 0, "return_format": "array", "preview_size": "medium", "library": "all", "mime_types": ""},

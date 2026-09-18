@@ -52,18 +52,13 @@ export default async function ExperiencesPage() {
 							<p className="text-sm text-[var(--muted)] mt-2 line-clamp-2">
 								{e.excerpt}
 							</p>
-							<div className="flex gap-2 mt-3">
-								{e.duration && (
-									<span className="text-[11px] border border-[var(--line)] bg-[var(--cream-2)] px-2.5 py-1 rounded-full">
-										{e.duration}
-									</span>
+								{e.location && (
+									<div className="flex gap-2 mt-3">
+										<span className="text-[11px] border border-[var(--line)] bg-[var(--cream-2)] px-2.5 py-1 rounded-full">
+											{e.location}
+										</span>
+									</div>
 								)}
-								{e.difficulty && (
-									<span className="text-[11px] border border-[var(--line)] bg-[var(--cream-2)] px-2.5 py-1 rounded-full">
-										{e.difficulty}
-									</span>
-								)}
-							</div>
 						</div>
 					</Link>
 				))}

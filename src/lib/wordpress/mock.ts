@@ -64,6 +64,7 @@ export const mockSettings: HotelSettings = {
 	currency: "NPR",
 	footerDescription:
 		"A peaceful Himalayan retreat shaped by nature, warm hospitality, and restorative natural hot springs in the heart of Myagdi.",
+	logoUrl: "",
 };
 
 export const mockRooms: Room[] = [
@@ -210,9 +211,11 @@ export const mockExperiences: Experience[] = [
 			"The spring is the hotel's quiet center. Bathe at dawn when steam lifts into forest light, or after a walk when legs are tired. Indoor and open-air pools, stone-lined, with space for silence.",
 		featuredImage: img(curated.exp1, 800, 600, "Hot spring bathing"),
 		gallery: [img(curated.exp1, 800, 600, "Spring")],
-		duration: "Open daily 6AM–9PM",
-		difficulty: "Easy",
-		season: "Year-round",
+		paragraphs: [
+			"The spring is the hotel's quiet center. Bathe at dawn when steam lifts into forest light, or after a walk when legs are tired. Indoor and open-air pools, stone-lined, with space for silence.",
+		],
+		activities: ["Dawn bathing", "Open-air pools", "Private soaks"],
+		location: "Hotel hot spring",
 		featured: true,
 	},
 	{
@@ -223,9 +226,11 @@ export const mockExperiences: Experience[] = [
 			"Guided or self-led walks from the hotel gate — ridge viewpoints, village paths and forest loops. Mornings are clearest.",
 		featuredImage: img(curated.exp2, 800, 600, "Mountain walks through pine"),
 		gallery: [img(curated.exp2, 800, 600, "Trail")],
-		duration: "1–4 hours",
-		difficulty: "Easy to Moderate",
-		season: "Sep–May best",
+		paragraphs: [
+			"Guided or self-led walks from the hotel gate — ridge viewpoints, village paths and forest loops. Mornings are clearest.",
+		],
+		activities: ["Ridge viewpoints", "Village paths", "Forest loops"],
+		location: "Hotel gate",
 		featured: true,
 	},
 	{
@@ -236,9 +241,11 @@ export const mockExperiences: Experience[] = [
 			"Walk to nearby villages, meet makers and farmers, taste local milks and honeys. A gentle immersion in Myagdi life.",
 		featuredImage: img(curated.exp3, 800, 600, "Village terraces"),
 		gallery: [img(curated.exp3, 800, 600, "Village")],
-		duration: "2–3 hours",
-		difficulty: "Easy",
-		season: "Year-round",
+		paragraphs: [
+			"Walk to nearby villages, meet makers and farmers, taste local milks and honeys. A gentle immersion in Myagdi life.",
+		],
+		activities: ["Village walks", "Tea houses", "Local tastings"],
+		location: "Nearby villages",
 		featured: true,
 	},
 	{
@@ -249,9 +256,11 @@ export const mockExperiences: Experience[] = [
 			"A short walk to river stones and shade. Bring tea, a book, or nothing at all.",
 		featuredImage: img(curated.exp4, 800, 600, "Riverside stones"),
 		gallery: [img(curated.exp4, 800, 600, "River")],
-		duration: "Flexible",
-		difficulty: "Easy",
-		season: "Year-round",
+		paragraphs: [
+			"A short walk to river stones and shade. Bring tea, a book, or nothing at all.",
+		],
+		activities: [],
+		location: "Riverside",
 		featured: false,
 	},
 	{
@@ -262,9 +271,11 @@ export const mockExperiences: Experience[] = [
 			"When the evening cools, we gather by the fire — music, tea, and mountain air.",
 		featuredImage: img(curated.exp5, 800, 600, "Bonfire evening"),
 		gallery: [img(curated.exp5, 800, 600, "Fire")],
-		duration: "Evenings",
-		difficulty: "Easy",
-		season: "Oct–Apr",
+		paragraphs: [
+			"When the evening cools, we gather by the fire — music, tea, and mountain air.",
+		],
+		activities: ["Bonfire", "Music", "Evening tea"],
+		location: "Hotel courtyard",
 		featured: true,
 	},
 	{
@@ -275,9 +286,11 @@ export const mockExperiences: Experience[] = [
 			"Short drives to viewpoints over Dhaulagiri and Annapurna on clear days.",
 		featuredImage: img(curated.exp6, 800, 600, "Mountain viewpoint"),
 		gallery: [img(curated.exp6, 800, 600, "View")],
-		duration: "Half-day",
-		difficulty: "Easy",
-		season: "Oct–Apr",
+		paragraphs: [
+			"Short drives to viewpoints over Dhaulagiri and Annapurna on clear days.",
+		],
+		activities: ["Sunrise viewpoints", "Photography stops"],
+		location: "Viewpoints",
 		featured: false,
 	},
 ];

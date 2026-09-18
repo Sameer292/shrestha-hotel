@@ -42,18 +42,13 @@ export default function Experiences({ items }: { items: Experience[] }) {
 								<p className="text-sm text-[var(--muted)] mt-2 line-clamp-2">
 									{e.excerpt}
 								</p>
-								<div className="flex gap-2 mt-3 text-[11px] tracking-wide">
-									{e.duration && (
+								{e.location && (
+									<div className="flex gap-2 mt-3 text-[11px] tracking-wide">
 										<span className="bg-[var(--cream-2)] border border-[var(--line)] px-2.5 py-1 rounded-full">
-											{e.duration}
+											{e.location}
 										</span>
-									)}
-									{e.difficulty && (
-										<span className="bg-[var(--cream-2)] border border-[var(--line)] px-2.5 py-1 rounded-full">
-											{e.difficulty}
-										</span>
-									)}
-								</div>
+									</div>
+								)}
 							</div>
 						</Link>
 					))}

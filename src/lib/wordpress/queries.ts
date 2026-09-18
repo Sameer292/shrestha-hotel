@@ -84,10 +84,10 @@ type WPRoomFields = {
 };
 
 type WPExperienceFields = {
-	duration?: string | null;
-	difficulty?: string | null;
-	season?: string | null;
-	optionalprice?: number | null;
+	paragraph2?: string | null;
+	paragraph3?: string | null;
+	activities?: string | null;
+	location?: string | null;
 	featured?: boolean | null;
 };
 
@@ -167,17 +167,24 @@ function mapExperience(
 ): Experience {
 	const f = n.experienceFields;
 	const name = clean(n.title);
+	const para1 = clean(n.content);
+	const paras = [para1, clean(f?.paragraph2), clean(f?.paragraph3)].filter(
+		Boolean,
+	);
+	const activities = (f?.activities ?? "")
+		.split("\n")
+		.map((a) => a.trim().replace(/^[-•\s]+/, ""))
+		.filter(Boolean);
 	return {
 		slug: n.slug,
 		name,
 		excerpt: clean(n.excerpt) || name,
-		description: clean(n.content),
+		description: para1,
 		featuredImage: nodeImage(n),
 		gallery: [],
-		duration: f?.duration || undefined,
-		difficulty: f?.difficulty || undefined,
-		season: f?.season || undefined,
-		price: f?.optionalprice ?? undefined,
+		paragraphs: paras,
+		activities,
+		location: clean(f?.location) || undefined,
 		featured: f?.featured ?? false,
 	};
 }
@@ -190,7 +197,7 @@ const SETTINGS_FIELDS = `
 	hotelName tagline subtagline phone secondaryPhone email whatsapp address
 	googleMapsUrl googleMapsEmbed latitude longitude
 	instagram facebook tripadvisor bookingUrl
-	checkIn checkOut currency footerDescription
+	checkIn checkOut currency footerDescription logoUrl
 `;
 
 export async function getHotelSettings(): Promise<HotelSettings> {
@@ -248,6 +255,7 @@ type WPPageFields = {
 	footerbackground?: WPImage | null;
 	footertagline?: string | null;
 	footersubtagline?: string | null;
+	footerdescription?: string | null;
 	finalctaheading?: string | null;
 	finalctadescription?: string | null;
 	finalctaimage?: WPImage | null;
@@ -343,7 +351,7 @@ const HOME_PAGE_FIELDS = `
 		heroeyebrow heroprimarycta heroprimaryctaurl herosecondarycta herosecondaryctaurl
 		storyeyebrow storyheading storybody storyimage1 { sourceUrl altText } storyimage2 { sourceUrl altText } storystats
 		locationheading locationtext
-		footerbackground { sourceUrl altText } footertagline footersubtagline
+		footerbackground { sourceUrl altText } footertagline footersubtagline footerdescription
 		finalctaheading finalctadescription finalctaimage { sourceUrl altText }
 		finalctaprimarycta finalctaprimaryctaurl finalctasecondarycta finalctasecondaryctaurl
 	}
@@ -386,6 +394,7 @@ export async function getHomeEntry(): Promise<HomeEntry | null> {
 		footerBackground: footerBg ?? undefined,
 		footerTagline: f?.footertagline || f?.tagline || "",
 		footerSubtagline: f?.footersubtagline || f?.subtagline || "",
+		footerDescription: f?.footerdescription || "",
 		finalCtaHeading: f?.finalctaheading || "",
 		finalCtaDescription: f?.finalctadescription || "",
 		finalCtaImage: finalImage,
@@ -637,8 +646,7 @@ export async function getExperiences(): Promise<Experience[]> {
 					slug title excerpt content
 					featuredImage { node { sourceUrl altText } }
 					experienceFields {
-						duration difficulty season optionalprice
-						featured
+						paragraph2 paragraph3 activities location featured
 					}
 				}
 			}

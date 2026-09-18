@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -20,11 +21,13 @@ export default function Header({
 	hotelName = "Shrestha Hotel",
 	phone = "+977 9800000000",
 	email = "namaste@shresthahotel.com",
+	logoUrl = "",
 }: {
 	bookingUrl?: string;
 	hotelName?: string;
 	phone?: string;
 	email?: string;
+	logoUrl?: string;
 }) {
 	const [scrolled, setScrolled] = useState(false);
 	const [open, setOpen] = useState(false);
@@ -53,18 +56,42 @@ export default function Header({
 				)}
 			>
 				<div className="container-outer flex items-center justify-between">
-					<Link href="/" className="flex items-center gap-3">
-						<span className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] tracking-[0.15em] font-medium border bg-[var(--gold)] text-white border-[var(--gold)]">
-							SH
-						</span>
-						<span className="leading-none text-[var(--forest)]">
-							<span className="block font-display text-[17px] tracking-[-0.02em] font-medium">
-								{hotelName.replace(/ Hotspring$/i, "")}
-							</span>
-							<span className="block text-[10px] tracking-[0.22em] uppercase opacity-70 -mt-[2px]">
-								Hotspring • Myagdi
-							</span>
-						</span>
+					<Link href="/" className="flex items-center gap-3" aria-label={hotelName}>
+						{logoUrl ? (
+							<>
+								<Image
+									src={logoUrl}
+									alt={hotelName}
+									width={240}
+									height={64}
+									className="h-12 w-auto object-contain"
+									unoptimized
+									priority
+								/>
+								<span className="leading-none text-[var(--gold)]">
+									<span className="block font-display text-[19px] tracking-[-0.02em] font-medium">
+										{hotelName.replace(/ Hotspring$/i, "")}
+									</span>
+									<span className="block text-[10px] tracking-[0.22em] uppercase opacity-80 -mt-[2px]">
+										Hotspring • Myagdi
+									</span>
+								</span>
+							</>
+						) : (
+							<>
+								<span className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] tracking-[0.15em] font-medium border bg-[var(--gold)] text-white border-[var(--gold)]">
+									SH
+								</span>
+								<span className="leading-none text-[var(--forest)]">
+									<span className="block font-display text-[17px] tracking-[-0.02em] font-medium">
+										{hotelName.replace(/ Hotspring$/i, "")}
+									</span>
+									<span className="block text-[10px] tracking-[0.22em] uppercase opacity-70 -mt-[2px]">
+										Hotspring • Myagdi
+									</span>
+								</span>
+							</>
+						)}
 					</Link>
 
 					<nav className="hidden lg:flex items-center gap-7">
