@@ -3,6 +3,13 @@
   "title": "Room Fields",
   "fields": [
     {
+      "key": "field_sh_room_units",
+      "name": "units",
+      "label": "Physical rooms of this type (booking inventory — empty = 1)",
+      "type": "number",
+      "min": 1
+    },
+    {
       "key": "field_sh_room_price",
       "name": "startingPrice",
       "label": "Starting Price",

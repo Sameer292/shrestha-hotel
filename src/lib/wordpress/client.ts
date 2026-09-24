@@ -86,3 +86,26 @@ export async function forwardInquiry(
 		return false;
 	}
 }
+
+// Booking engine proxy (mu-plugins/shrestha-booking.php). Pass-through to
+// WP REST with WP's status preserved; never throws.
+export async function wpBooking(
+	path: "availability" | "quote" | "bookings" | "bookings/lookup" | "bookings/cancel",
+	body: Record<string, unknown>,
+): Promise<{ ok: boolean; status: number; data: unknown }> {
+	const api = process.env.WORDPRESS_API_URL || "";
+	const base = api.replace(/\/graphql\/?$/, "");
+	if (!base) return { ok: false, status: 502, data: { message: "WP unreachable" } };
+	try {
+		const res = await fetch(`${base}/wp-json/sh/v1/${path}`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(body),
+			cache: "no-store",
+		});
+		const data = await res.json().catch(() => null);
+		return { ok: res.ok, status: res.status, data };
+	} catch {
+		return { ok: false, status: 502, data: { message: "WP unreachable" } };
+	}
+}

@@ -68,6 +68,7 @@ type WPItemNode = {
 
 type WPRoomFields = {
 	startingprice?: number | null;
+	units?: number | null;
 	currency?: string | null;
 	capacity?: number | null;
 	adults?: number | null;
@@ -148,6 +149,7 @@ function mapRoom(n: WPItemNode & { roomFields?: WPRoomFields | null }): Room {
 			name,
 		),
 		startingPrice: f?.startingprice ?? undefined,
+		units: f?.units && f.units > 0 ? f.units : 1,
 		currency: f?.currency || "NPR",
 		capacity: f?.capacity ?? 2,
 		adults: f?.adults ?? 2,
@@ -207,6 +209,7 @@ const SETTINGS_FIELDS = `
 	googleMapsUrl googleMapsEmbed latitude longitude
 	instagram facebook tripadvisor bookingUrl
 	checkIn checkOut currency footerDescription logoUrl
+	mealPlans extraBedPrice pickupPrice taxPercent servicePercent
 `;
 
 export async function getHotelSettings(): Promise<HotelSettings> {
@@ -756,7 +759,7 @@ const ROOM_FIELDS = `
 	slug title excerpt content
 	featuredImage { node { sourceUrl altText } }
 		roomFields {
-			startingprice currency capacity adults children
+			startingprice units currency capacity adults children
 			bedtype roomsize view amenities checkin checkout
 			galleryimage1 { sourceUrl altText }
 			galleryimage2 { sourceUrl altText }
