@@ -59,6 +59,7 @@ async function withFallback<T>(
 type WPImage = { sourceUrl: string; altText: string };
 
 type WPItemNode = {
+	databaseId?: number | null;
 	slug: string;
 	title: string;
 	excerpt: string;
@@ -141,6 +142,7 @@ function mapRoom(n: WPItemNode & { roomFields?: WPRoomFields | null }): Room {
 	return {
 		slug: n.slug,
 		name,
+		id: n.databaseId ?? 0,
 		excerpt: clean(n.excerpt) || name,
 		description: clean(n.content),
 		featuredImage: nodeImage(n),
@@ -756,7 +758,7 @@ export async function getContactPage(): Promise<ContactPage | null> {
 }
 
 const ROOM_FIELDS = `
-	slug title excerpt content
+	slug title excerpt content databaseId
 	featuredImage { node { sourceUrl altText } }
 		roomFields {
 			startingprice units currency capacity adults children

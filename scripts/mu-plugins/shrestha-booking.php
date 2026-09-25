@@ -281,6 +281,7 @@ function sh_booking_notify($post, $quote, $args) {
             . get_post_meta($post->ID, '_children', true) . ' children, '
             . get_post_meta($post->ID, '_infants', true) . ' infants',
         'Purpose: ' . (get_post_meta($post->ID, '_purpose', true) ?: '—'),
+        'Requests: ' . (get_post_meta($post->ID, '_requests', true) ?: '—'),
         'Meal plan: ' . (get_post_meta($post->ID, '_meal_plan', true) ?: 'Room only'),
         'Total (pay at hotel): ' . $quote['currency'] . ' ' . number_format((float)$quote['total'], 2),
         '',
@@ -422,6 +423,7 @@ add_action('rest_api_init', function () {
                 '_adults' => $args['adults'], '_children' => $args['children'],
                 '_infants' => $args['infants'], '_extra_beds' => $args['extra_beds'],
                 '_meal_plan' => $args['meal_plan'], '_pickup' => $args['pickup'] ? '1' : '0',
+                '_requests' => sanitize_textarea_field((string)($req['requests'] ?? '')),
                 '_total' => $q['total'], '_currency' => $q['currency'],
                 '_breakdown' => wp_json_encode($q['lines']),
             ];

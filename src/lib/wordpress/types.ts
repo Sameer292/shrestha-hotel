@@ -8,6 +8,7 @@ export type Media = {
 export type Room = {
 	slug: string;
 	name: string;
+	id?: number;
 	excerpt: string;
 	description: string;
 	featuredImage: Media;

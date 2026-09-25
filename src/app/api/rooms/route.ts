@@ -6,5 +6,13 @@ export const revalidate = 10;
 
 export async function GET() {
 	const rooms = await getRooms();
-	return NextResponse.json(rooms.map((r) => ({ slug: r.slug, name: r.name })));
+	return NextResponse.json(
+		rooms.map((r) => ({
+			slug: r.slug,
+			name: r.name,
+			id: r.id ?? 0,
+			startingPrice: r.startingPrice ?? null,
+			currency: r.currency ?? "NPR",
+		})),
+	);
 }
