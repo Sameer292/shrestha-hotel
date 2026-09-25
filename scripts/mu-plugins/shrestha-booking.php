@@ -40,6 +40,7 @@ add_action('init', 'sh_booking_ensure_table', 5);
 add_action('init', function () {
     register_post_type('booking', [
         'label' => 'Bookings',
+        'labels' => ['singular_name' => 'Booking', 'all_items' => 'All Bookings'],
         'public' => false,
         'show_ui' => true,
         'show_in_menu' => true,
@@ -53,6 +54,239 @@ add_action('init', function () {
         'map_meta_cap' => true,
     ]);
 });
+
+// ---------- staff-friendly list: columns, sorting, filters ----------
+function sh_booking_col_map() {
+    return [
+        'ref' => 'Ref',
+        'guest' => 'Guest',
+        'room' => 'Room',
+        'stay' => 'Stay',
+        'guests' => 'Guests',
+        'total' => 'Total',
+        'status' => 'Status',
+    ];
+}
+
+add_filter('manage_booking_posts_columns', function ($cols) {
+    // Keep checkbox + date, replace the rest with readable columns.
+    $out = [];
+    foreach ($cols as $k => $v) {
+        if ($k === 'cb') $out[$k] = $v;
+    }
+    foreach (sh_booking_col_map() as $k => $v) $out[$k] = $v;
+    $out['date'] = $cols['date'] ?? 'Date';
+    return $out;
+});
+
+add_action('manage_booking_posts_custom_column', function ($col, $post_id) {
+    $room_id = (int)get_post_meta($post_id, '_room_id', true);
+    $room = $room_id ? get_post($room_id) : null;
+    switch ($col) {
+        case 'ref':
+            echo '<strong>' . esc_html(get_post_meta($post_id, '_booking_ref', true)) . '</strong>';
+            break;
+        case 'guest':
+            echo esc_html(get_post_meta($post_id, '_guest_name', true))
+                . '<br><span style="color:#646970">' . esc_html(get_post_meta($post_id, '_guest_email', true)) . '</span>'
+                . '<br><span style="color:#646970">' . esc_html(get_post_meta($post_id, '_guest_phone', true)) . '</span>';
+            break;
+        case 'room':
+            echo $room ? esc_html($room->post_title) : '—';
+            break;
+        case 'stay':
+            echo esc_html(get_post_meta($post_id, '_checkin', true))
+                . ' → ' . esc_html(get_post_meta($post_id, '_checkout', true))
+                . '<br><span style="color:#646970">' . (int)get_post_meta($post_id, '_nights', true) . ' nights</span>';
+            break;
+        case 'guests':
+            echo (int)get_post_meta($post_id, '_adults', true) . 'A / '
+                . (int)get_post_meta($post_id, '_children', true) . 'C / '
+                . (int)get_post_meta($post_id, '_infants', true) . 'I';
+            break;
+        case 'total':
+            echo esc_html(get_post_meta($post_id, '_currency', true) . ' '
+                . number_format((float)get_post_meta($post_id, '_total', true), 2));
+            break;
+        case 'status':
+            $st = get_post_meta($post_id, '_status', true) ?: 'confirmed';
+            $colors = [
+                'confirmed' => '#1a7f37;background:#dcfce7',
+                'cancelled' => '#82071e;background:#ffebe9',
+                'completed' => '#ffffff;background:#59636e',
+                'no-show' => '#ffffff;background:#9e6a03',
+            ];
+            [$fg, $bg] = explode(';', $colors[$st] ?? $colors['completed']);
+            echo '<span style="display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;color:' . esc_attr($fg) . ';background:' . esc_attr($bg) . '">' . esc_html($st) . '</span>';
+            break;
+    }
+}, 10, 2);
+
+add_filter('manage_edit-booking_sortable_columns', function ($cols) {
+    $cols['stay'] = '_checkin';
+    $cols['total'] = '_total';
+    return $cols;
+});
+
+add_action('pre_get_posts', function ($q) {
+    if (!is_admin() || !$q->is_main_query() || $q->get('post_type') !== 'booking') return;
+    // Sort by check-in / total.
+    if ($q->get('orderby') === '_checkin') {
+        $q->set('meta_key', '_checkin');
+        $q->set('orderby', 'meta_value');
+    } elseif ($q->get('orderby') === '_total') {
+        $q->set('meta_key', '_total');
+        $q->set('orderby', 'meta_value_num');
+    }
+    // Default order: soonest check-in first.
+    if (!$q->get('orderby')) {
+        $q->set('meta_key', '_checkin');
+        $q->set('orderby', 'meta_value');
+        $q->set('order', 'ASC');
+    }
+    // Staff filters: status + room.
+    $meta = [];
+    if (!empty($_GET['sh_status'])) {
+        $meta[] = ['key' => '_status', 'value' => sanitize_key($_GET['sh_status'])];
+    }
+    if (!empty($_GET['sh_room'])) {
+        $meta[] = ['key' => '_room_id', 'value' => (int)$_GET['sh_room']];
+    }
+    if ($meta) $q->set('meta_query', $meta);
+});
+
+add_action('restrict_manage_posts', function ($post_type) {
+    if ($post_type !== 'booking') return;
+    $rooms = get_posts(['post_type' => 'room', 'post_status' => 'publish', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC', 'no_found_rows' => true]);
+    echo '<select name="sh_status"><option value="">All statuses</option>';
+    foreach (['confirmed', 'cancelled', 'completed', 'no-show'] as $st) {
+        printf('<option value="%s"%s>%s</option>', esc_attr($st), selected($_GET['sh_status'] ?? '', $st, false), esc_html(ucfirst($st)));
+    }
+    echo '</select> <select name="sh_room"><option value="">All rooms</option>';
+    foreach ($rooms as $r) {
+        printf('<option value="%d"%s>%s</option>', $r->ID, selected($_GET['sh_room'] ?? '', (string)$r->ID, false), esc_html($r->post_title));
+    }
+    echo '</select>';
+});
+
+// ---------- readable booking view (plain-English meta box) ----------
+add_action('add_meta_boxes_booking', function () {
+    add_meta_box('sh_booking_view', 'Booking details', 'sh_booking_meta_box', 'booking', 'normal', 'high');
+});
+
+function sh_booking_meta_box($post) {
+    $id = $post->ID;
+    $room = get_post((int)get_post_meta($id, '_room_id', true));
+    $rows = [
+        'Reference' => get_post_meta($id, '_booking_ref', true),
+        'Status' => get_post_meta($id, '_status', true) ?: 'confirmed',
+        'Room' => $room ? $room->post_title : '—',
+        'Check-in' => get_post_meta($id, '_checkin', true),
+        'Check-out' => get_post_meta($id, '_checkout', true),
+        'Nights' => (int)get_post_meta($id, '_nights', true),
+        'Guest' => get_post_meta($id, '_guest_name', true),
+        'Email' => get_post_meta($id, '_guest_email', true),
+        'Phone' => get_post_meta($id, '_guest_phone', true),
+        'Country' => get_post_meta($id, '_guest_country', true) ?: '—',
+        'Purpose' => get_post_meta($id, '_purpose', true) ?: '—',
+        'Adults / Children / Infants' => (int)get_post_meta($id, '_adults', true) . ' / ' . (int)get_post_meta($id, '_children', true) . ' / ' . (int)get_post_meta($id, '_infants', true),
+        'Meal plan' => get_post_meta($id, '_meal_plan', true) ?: 'Room only',
+        'Extra beds' => (int)get_post_meta($id, '_extra_beds', true),
+        'Pickup' => get_post_meta($id, '_pickup', true) ? 'Yes' : 'No',
+        'Requests' => get_post_meta($id, '_requests', true) ?: '—',
+        'Total' => get_post_meta($id, '_currency', true) . ' ' . number_format((float)get_post_meta($id, '_total', true), 2),
+    ];
+    echo '<table class="widefat striped"><tbody>';
+    foreach ($rows as $k => $v) {
+        echo '<tr><th style="width:220px">' . esc_html($k) . '</th><td>' . esc_html((string)$v) . '</td></tr>';
+    }
+    echo '</tbody></table>';
+    $breakdown = json_decode((string)get_post_meta($id, '_breakdown', true), true) ?: [];
+    if ($breakdown) {
+        echo '<h4 style="margin:12px 0 4px">Price breakdown</h4><table class="widefat striped"><tbody>';
+        foreach ($breakdown as $l) {
+            echo '<tr><td>' . esc_html($l['label'] ?? '') . '</td><td style="width:140px">' . esc_html(number_format((float)($l['amount'] ?? 0), 2)) . '</td></tr>';
+        }
+        echo '</tbody></table>';
+    }
+}
+
+// ---------- availability board: rooms × next 30 days ----------
+add_action('admin_menu', function () {
+    add_submenu_page(
+        'edit.php?post_type=booking',
+        'Availability',
+        'Availability',
+        'edit_posts',
+        'sh-availability',
+        'sh_booking_availability_page'
+    );
+});
+
+function sh_booking_availability_page() {
+    global $wpdb;
+    $table = sh_booking_table_name();
+    $tz = wp_timezone();
+    $start_raw = sanitize_text_field($_GET['start'] ?? '');
+    $start = DateTime::createFromFormat('Y-m-d', $start_raw, $tz) ?: new DateTime('today', $tz);
+    $days = [];
+    $d = clone $start;
+    for ($i = 0; $i < 30; $i++) {
+        $days[] = $d->format('Y-m-d');
+        $d->modify('+1 day');
+    }
+    $rooms = get_posts(['post_type' => 'room', 'post_status' => 'publish', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC', 'no_found_rows' => true]);
+    // One query for the whole board.
+    $in = implode(',', array_fill(0, count($days), '%s'));
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    $rows = $wpdb->get_results($wpdb->prepare(
+        "SELECT room_id, night, units_taken FROM $table WHERE night IN ($in)",
+        ...$days
+    ), ARRAY_A);
+    $taken = [];
+    foreach ((array)$rows as $r) $taken[(int)$r['room_id']][$r['night']] = (int)$r['units_taken'];
+
+    $prev = (clone $start)->modify('-30 days')->format('Y-m-d');
+    $next = (clone $start)->modify('+30 days')->format('Y-m-d');
+    echo '<div class="wrap"><h1>Room availability</h1>';
+    echo '<p>Booked / total rooms per night. Green = free, amber = filling, red = full.</p>';
+    printf(
+        '<p><a class="button" href="%s">&larr; Previous 30 days</a> <strong>%s → %s</strong> <a class="button" href="%s">Next 30 days &rarr;</a></p>',
+        esc_url(admin_url('edit.php?post_type=booking&page=sh-availability&start=' . $prev)),
+        esc_html($days[0]),
+        esc_html(end($days)),
+        esc_url(admin_url('edit.php?post_type=booking&page=sh-availability&start=' . $next))
+    );
+    echo '<div style="overflow-x:auto"><table class="widefat striped" style="width:max-content;min-width:100%"><thead><tr><th style="position:sticky;left:0;background:#fff">Room</th>';
+    foreach ($days as $day) {
+        $dt = DateTime::createFromFormat('Y-m-d', $day, $tz);
+        echo '<th style="text-align:center;min-width:64px">' . esc_html($dt->format('d M')) . '<br><span style="font-weight:normal;color:#646970">' . esc_html($dt->format('D')) . '</span></th>';
+    }
+    echo '</tr></thead><tbody>';
+    foreach ($rooms as $r) {
+        $units = sh_booking_room_units($r->ID);
+        echo '<tr><td style="position:sticky;left:0;background:#fff;font-weight:600">' . esc_html($r->post_title) . '<br><span style="font-weight:normal;color:#646970">' . $units . ' rooms</span></td>';
+        foreach ($days as $day) {
+            $t = $taken[$r->ID][$day] ?? 0;
+            $free = $units - $t;
+            if ($free <= 0) {
+                $bg = '#ffebe9';
+            } elseif ($free <= max(1, (int)floor($units / 2))) {
+                $bg = '#fff8c5';
+            } else {
+                $bg = '#dcfce7';
+            }
+            printf(
+                '<td style="text-align:center;background:%s">%d/%d</td>',
+                esc_attr($bg),
+                $t,
+                $units
+            );
+        }
+        echo '</tr>';
+    }
+    echo '</tbody></table></div></div>';
+}
 
 // ---------- helpers ----------
 function sh_booking_room_units($room_id) {
