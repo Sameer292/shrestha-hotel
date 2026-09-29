@@ -212,6 +212,7 @@ const SETTINGS_FIELDS = `
 	instagram facebook tripadvisor bookingUrl
 	checkIn checkOut currency footerDescription logoUrl
 	mealPlans extraBedPrice pickupPrice taxPercent servicePercent
+	cancellationPolicy paymentTerms childPolicy idRequirement
 `;
 
 export async function getHotelSettings(): Promise<HotelSettings> {

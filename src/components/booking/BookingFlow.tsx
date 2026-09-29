@@ -21,6 +21,9 @@ type Quote = {
 type BookingOpts = {
 	currency: string;
 	mealPlans: MealPlan[];
+	policies: string[];
+	checkIn: string;
+	checkOut: string;
 };
 
 const inputCls =
@@ -53,6 +56,7 @@ export default function BookingFlow() {
 	const [email, setEmail] = useState("");
 	const [phone, setPhone] = useState("");
 	const [requests, setRequests] = useState("");
+	const [agree, setAgree] = useState(false);
 	const [quote, setQuote] = useState<Quote | null>(null);
 	const [result, setResult] = useState<{ ref: string; total: number; currency: string } | null>(null);
 	const [loading, setLoading] = useState(false);
@@ -140,6 +144,10 @@ export default function BookingFlow() {
 		setError("");
 		if (name.trim().length < 2 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
 			setError("Name and a valid email are required.");
+			return;
+		}
+		if (!agree) {
+			setError("Please accept the booking policies to continue.");
 			return;
 		}
 		setLoading(true);
@@ -450,6 +458,45 @@ export default function BookingFlow() {
 								onChange={(e) => setRequests(e.target.value)}
 								className="mt-1 w-full border border-[var(--line)] rounded-xl px-4 py-3 text-sm"
 							/>
+						</label>
+						{(opts?.policies?.length ?? 0) > 0 && (
+							<div className="bg-[var(--cream-2)] border border-[var(--line)] rounded-2xl p-5 text-sm space-y-1.5">
+								<p className="font-medium text-[var(--forest)]">
+									Good to know
+									{opts?.checkIn && opts?.checkOut && (
+										<span className="font-normal text-[var(--muted)]">
+											{" "}
+											· Check-in {opts.checkIn} · Check-out {opts.checkOut}
+										</span>
+									)}
+								</p>
+								<ul className="space-y-1.5">
+									{(opts?.policies ?? []).map((p, i) => (
+										<li
+											key={i}
+											className="flex gap-2.5 text-[var(--muted)] leading-relaxed"
+										>
+											<span
+												aria-hidden
+												className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--gold)]"
+											/>
+											{p}
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
+						<label className="flex items-start gap-3 text-sm">
+							<input
+								type="checkbox"
+								checked={agree}
+								onChange={(e) => setAgree(e.target.checked)}
+								className="w-4 h-4 mt-0.5"
+							/>
+							<span className="text-[var(--muted)]">
+								I accept the booking policies above and understand I pay at
+								the hotel.
+							</span>
 						</label>
 						<div className="flex gap-3">
 							<button

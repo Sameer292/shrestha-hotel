@@ -94,6 +94,10 @@ export type HotelSettings = {
 	pickupPrice?: string;
 	taxPercent?: string;
 	servicePercent?: string;
+	cancellationPolicy?: string;
+	paymentTerms?: string;
+	childPolicy?: string;
+	idRequirement?: string;
 };
 
 // Home Content CPT entry (slug: home) — homepage + footer identity.

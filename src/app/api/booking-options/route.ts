@@ -23,5 +23,13 @@ export async function GET() {
 		pickupPrice: parseFloat(s.pickupPrice ?? "") || 0,
 		taxPercent: parseFloat(s.taxPercent ?? "") || 0,
 		servicePercent: parseFloat(s.servicePercent ?? "") || 0,
+		checkIn: s.checkIn || "",
+		checkOut: s.checkOut || "",
+		policies: [
+			s.cancellationPolicy || "",
+			s.paymentTerms || "",
+			s.childPolicy || "",
+			s.idRequirement || "",
+		].filter(Boolean),
 	});
 }

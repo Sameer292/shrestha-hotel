@@ -522,6 +522,24 @@ function sh_booking_notify($post, $quote, $args) {
         'Price breakdown:',
     ]);
     $body = $detail . "\n" . implode("\n", $lines);
+    // House policies (editable in Hotel Content) — guests see these at
+    // booking time too; repeating them here removes later arguments.
+    $policies = [];
+    if (function_exists('sh_get_hotel')) {
+        $h = sh_get_hotel();
+        foreach ([
+            'cancellationPolicy' => 'Cancellation',
+            'paymentTerms' => 'Payment',
+            'childPolicy' => 'Children',
+            'idRequirement' => 'Check-in',
+        ] as $k => $label) {
+            if (!empty($h[$k])) $policies[] = "$label: " . $h[$k];
+        }
+        if (empty($policies)) {
+            $policies[] = 'Check-in: ' . ($h['checkIn'] ?? '') . ' / Check-out: ' . ($h['checkOut'] ?? '');
+        }
+    }
+    if ($policies) $body .= "\n\nGood to know:\n- " . implode("\n- ", $policies);
     // Guest confirmation.
     sh_booking_mail($email, "Your booking $ref is confirmed — Shrestha Hotel", "Namaste $name,\n\nYour booking is confirmed. Pay at the hotel on arrival.\n\n$body");
     // Hotel notification.
@@ -742,3 +760,120 @@ add_action('rest_api_init', function () {
         },
     ]);
 });
+
+// ---------- calendar: who is in which room, when ----------
+add_action('admin_menu', function () {
+    add_submenu_page(
+        'edit.php?post_type=booking',
+        'Calendar',
+        'Calendar',
+        'edit_posts',
+        'sh-calendar',
+        'sh_booking_calendar_page'
+    );
+});
+
+function sh_booking_calendar_page() {
+    $tz = wp_timezone();
+    $month_raw = sanitize_text_field($_GET['month'] ?? '');
+    $month = DateTime::createFromFormat('Y-m', $month_raw, $tz) ?: new DateTime('first day of this month', $tz);
+    $month->modify('first day of this month');
+    $month_start = $month->format('Y-m-01');
+    $next_start = (clone $month)->modify('+1 month')->format('Y-m-01');
+    $days_in_month = (int)$month->format('t');
+    $today = (new DateTime('today', $tz))->format('Y-m-d');
+    $room_filter = (int)($_GET['room'] ?? 0);
+
+    $rooms = get_posts(['post_type' => 'room', 'post_status' => 'publish', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC', 'no_found_rows' => true]);
+    if ($room_filter) $rooms = array_values(array_filter($rooms, fn($r) => $r->ID === $room_filter));
+
+    // All bookings touching this month (any status except trash).
+    $all = get_posts([
+        'post_type' => 'booking',
+        'post_status' => 'publish',
+        'numberposts' => -1,
+        'no_found_rows' => true,
+        'meta_query' => [
+            ['key' => '_checkin', 'value' => $next_start, 'compare' => '<', 'type' => 'DATE'],
+            ['key' => '_checkout', 'value' => $month_start, 'compare' => '>', 'type' => 'DATE'],
+        ],
+    ]);
+    $by_room = [];
+    foreach ($all as $p) {
+        $rid = (int)get_post_meta($p->ID, '_room_id', true);
+        $by_room[$rid][] = [
+            'id' => $p->ID,
+            'ref' => get_post_meta($p->ID, '_booking_ref', true),
+            'name' => get_post_meta($p->ID, '_guest_name', true),
+            'in' => get_post_meta($p->ID, '_checkin', true),
+            'out' => get_post_meta($p->ID, '_checkout', true),
+            'status' => get_post_meta($p->ID, '_status', true) ?: 'confirmed',
+        ];
+    }
+
+    $colors = [
+        'confirmed' => 'background:#dcfce7;color:#1a7f37',
+        'completed' => 'background:#e8eaed;color:#59636e',
+        'cancelled' => 'background:#ffebe9;color:#82071e;text-decoration:line-through',
+        'no-show' => 'background:#fff8c5;color:#9e6a03',
+    ];
+    $prev = (clone $month)->modify('-1 month')->format('Y-m');
+    $next = (clone $month)->modify('+1 month')->format('Y-m');
+    $base = admin_url('edit.php?post_type=booking&page=sh-calendar');
+
+    echo '<div class="wrap"><h1>Booking calendar</h1>';
+    echo '<form method="get" style="margin:12px 0;display:flex;gap:8px;align-items:center">';
+    echo '<input type="hidden" name="post_type" value="booking"><input type="hidden" name="page" value="sh-calendar">';
+    printf(
+        '<a class="button" href="%s">&larr;</a> <strong style="font-size:15px">%s</strong> <a class="button" href="%s">&rarr;</a>',
+        esc_url($base . '&month=' . $prev), esc_html($month->format('F Y')), esc_url($base . '&month=' . $next)
+    );
+    echo '<input type="month" name="month" value="' . esc_attr($month->format('Y-m')) . '">';
+    echo '<select name="room"><option value="0">All rooms</option>';
+    $all_rooms = get_posts(['post_type' => 'room', 'post_status' => 'publish', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC', 'no_found_rows' => true]);
+    foreach ($all_rooms as $r) {
+        printf('<option value="%d"%s>%s</option>', $r->ID, selected($room_filter, $r->ID, false), esc_html($r->post_title));
+    }
+    echo '</select><button class="button button-primary">Show</button></form>';
+
+    echo '<p><span style="display:inline-block;width:12px;height:12px;background:#dcfce7;border:1px solid #1a7f37"></span> confirmed &nbsp;'
+        . '<span style="display:inline-block;width:12px;height:12px;background:#e8eaed;border:1px solid #59636e"></span> completed &nbsp;'
+        . '<span style="display:inline-block;width:12px;height:12px;background:#ffebe9;border:1px solid #82071e"></span> cancelled &nbsp;'
+        . '<span style="display:inline-block;width:12px;height:12px;background:#fff8c5;border:1px solid #9e6a03"></span> no-show</p>';
+
+    echo '<div style="overflow-x:auto;border:1px solid #c3c4c7;background:#fff"><table class="widefat" style="border:0;width:max-content;min-width:100%;border-collapse:collapse"><thead><tr><th style="position:sticky;left:0;background:#fff;z-index:2;min-width:160px">Room</th>';
+    for ($d = 1; $d <= $days_in_month; $d++) {
+        $date = $month->format('Y-m-') . str_pad((string)$d, 2, '0', STR_PAD_LEFT);
+        $dow = (new DateTime($date, $tz))->format('D');
+        $hl = $date === $today ? 'background:#fff8c5;' : '';
+        echo '<th style="text-align:center;min-width:96px;' . esc_attr($hl) . '">' . $d . '<br><span style="font-weight:normal;color:#646970;font-size:11px">' . esc_html($dow) . '</span></th>';
+    }
+    echo '</tr></thead><tbody>';
+    foreach ($rooms as $r) {
+        echo '<tr><td style="position:sticky;left:0;background:#fff;z-index:1;font-weight:600">' . esc_html($r->post_title) . '</td>';
+        $bookings = $by_room[$r->ID] ?? [];
+        for ($d = 1; $d <= $days_in_month; $d++) {
+            $date = $month->format('Y-m-') . str_pad((string)$d, 2, '0', STR_PAD_LEFT);
+            $cell = '<td style="border-left:1px solid #eee;min-width:96px;max-width:96px;overflow:hidden"></td>';
+            $covering = [];
+            foreach ($bookings as $b) {
+                if ($b['in'] <= $date && $date < $b['out']) $covering[] = $b;
+            }
+            if ($covering) {
+                // Multi-unit rooms can hold several stays a night: label the
+                // first, count the rest.
+                $b = $covering[0];
+                $show_name = ($b['in'] >= $month_start && $b['in'] === $date) || ($b['in'] < $month_start && $d === 1);
+                $label = $show_name ? $b['name'] . ' · ' . $b['ref'] : '';
+                if (count($covering) > 1 && $show_name) $label .= ' (+' . (count($covering) - 1) . ')';
+                $title = implode(' | ', array_map(fn($x) => $x['name'] . ' · ' . $x['ref'] . ' · ' . $x['in'] . ' → ' . $x['out'], $covering));
+                $link = esc_url(get_edit_post_link($b['id']));
+                $cell = '<td title="' . esc_attr($title) . '" style="border-left:1px solid #eee;min-width:96px;max-width:96px;overflow:hidden;white-space:nowrap;' . esc_attr($colors[$b['status']] ?? $colors['confirmed']) . '">'
+                    . ($label !== '' ? '<a href="' . $link . '" style="color:inherit;font-size:12px">' . esc_html($label) . '</a>' : '') . '</td>';
+            }
+            echo $cell; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        }
+        echo '</tr>';
+    }
+    echo '</tbody></table></div></div>';
+}
