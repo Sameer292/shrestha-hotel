@@ -24,5 +24,5 @@ for _ in $(seq 1 60); do
 done
 [ "$ok" = 1 ] || { echo "✗ app didn't answer — see: $COMPOSE logs app"; exit 1; }
 
-echo "✓ live: https://shresthahotel.hashtagweb.com.np (via Hestia nginx → 127.0.0.1:3200)"
+echo "✓ live: https://shresthahotelhotspring.com (via Hestia nginx → 127.0.0.1:3200)"
 $COMPOSE ps
