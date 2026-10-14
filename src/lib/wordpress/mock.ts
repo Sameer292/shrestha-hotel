@@ -47,7 +47,7 @@ export const mockSettings: HotelSettings = {
 	subtagline:
 		"A peaceful Himalayan retreat shaped by nature, warm hospitality, and restorative natural hot springs.",
 	phone: "+977 9800000000",
-	email: "namaste@shresthahotel.com",
+	email: "namaste@shresthahotelhotspring.com",
 	whatsapp: "+9779800000000",
 	address: "Beni, Myagdi, Gandaki Province, Nepal",
 	googleMapsUrl: "https://maps.google.com/?q=Beni+Myagdi+Nepal",

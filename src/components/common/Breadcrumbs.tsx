@@ -38,7 +38,7 @@ export default function Breadcrumbs({
 							position: idx + 1,
 							name: it.label,
 							item: it.href
-								? `https://www.shresthahotel.com${it.href}`
+								? `https://shresthahotelhotspring.com${it.href}`
 								: undefined,
 						})),
 					}),

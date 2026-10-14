@@ -21,7 +21,7 @@ const body = DM_Sans({
 
 export const metadata: Metadata = {
 	metadataBase: new URL(
-		process.env.NEXT_PUBLIC_SITE_URL || "https://www.shresthahotel.com",
+		process.env.NEXT_PUBLIC_SITE_URL || "https://shresthahotelhotspring.com",
 	),
 	title: {
 		default: "Shrestha Hotel Hotspring — Where the Mountains Meet Warm Waters",
@@ -94,7 +94,7 @@ export default async function RootLayout({
 							},
 							telephone: s.phone,
 							email: s.email,
-							url: "https://www.shresthahotel.com",
+							url: "https://shresthahotelhotspring.com",
 						}),
 					}}
 				/>

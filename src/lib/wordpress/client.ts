@@ -3,7 +3,7 @@ import { z } from "zod";
 const WP_URL =
 	process.env.WORDPRESS_API_URL || process.env.WORDPRESS_GRAPHQL_URL || "";
 export const SITE_URL =
-	process.env.NEXT_PUBLIC_SITE_URL || "https://www.shresthahotel.com";
+	process.env.NEXT_PUBLIC_SITE_URL || "https://shresthahotelhotspring.com";
 
 // deduplicate repeated GraphQL errors in dev so terminal isn't spammed
 const seenErrors = new Set<string>();

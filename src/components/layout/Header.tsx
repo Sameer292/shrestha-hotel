@@ -21,7 +21,7 @@ export default function Header({
 	bookingUrl = "/booking",
 	hotelName = "Shrestha Hotel",
 	phone = "+977 9800000000",
-	email = "namaste@shresthahotel.com",
+	email = "namaste@shresthahotelhotspring.com",
 	logoUrl = "",
 }: {
 	bookingUrl?: string;

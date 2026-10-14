@@ -36,7 +36,8 @@ const nextConfig: NextConfig = {
     // then remove it. No picsum, no wildcards.
     remotePatterns: [
       { protocol: "http", hostname: "localhost", port: "8080" },
-      { protocol: "https", hostname: "cms.shresthahotel.com" },
+      { protocol: "https", hostname: "shresthahotelhotspring.com" },
+      { protocol: "https", hostname: "www.shresthahotelhotspring.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
