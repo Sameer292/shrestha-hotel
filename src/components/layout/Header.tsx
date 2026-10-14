@@ -129,13 +129,13 @@ export default function Header({
 					open ? "translate-y-0" : "-translate-y-full",
 				)}
 			>
-				<div className="pt-20 pb-6 container-outer flex flex-col gap-1 flex-1">
+				<div className="pt-16 pb-4 container-outer flex flex-col gap-0 flex-1">
 					{NAV.map((l) => (
 						<Link
 							key={l.href}
 							href={l.href}
 							onClick={() => setOpen(false)}
-							className="font-display text-[32px] leading-[1.1] tracking-[-0.02em] text-[var(--forest)] py-3 border-b border-[var(--line)] flex justify-between items-center group"
+							className="font-display text-[24px] leading-[1.05] tracking-[-0.02em] text-[var(--forest)] py-2 border-b border-[var(--line)] flex justify-between items-center group"
 						>
 							<span>{l.label}</span>
 							<span className="text-[11px] tracking-[0.2em] uppercase text-[var(--muted)] group-hover:text-[var(--forest)]">
@@ -146,7 +146,7 @@ export default function Header({
 					<Link
 						href={bookingUrl}
 						onClick={() => setOpen(false)}
-					className="mt-6 bg-[var(--forest)] text-white rounded-full py-4 text-center text-sm tracking-wide font-medium sticky bottom-6"
+					className="mt-4 bg-[var(--forest)] text-white rounded-full py-3 text-center text-sm tracking-wide font-medium sticky bottom-4"
 				>
 					Book Your Stay
 				</Link>
