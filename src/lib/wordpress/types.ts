@@ -8,11 +8,13 @@ export type Media = {
 export type Room = {
 	slug: string;
 	name: string;
+	id?: number;
 	excerpt: string;
 	description: string;
 	featuredImage: Media;
 	gallery: Media[];
 	startingPrice?: number;
+	units?: number;
 	currency?: string;
 	capacity: number;
 	adults: number;
@@ -87,6 +89,15 @@ export type HotelSettings = {
 	currency: string;
 	footerDescription: string;
 	logoUrl?: string;
+	mealPlans?: string;
+	extraBedPrice?: string;
+	pickupPrice?: string;
+	taxPercent?: string;
+	servicePercent?: string;
+	cancellationPolicy?: string;
+	paymentTerms?: string;
+	childPolicy?: string;
+	idRequirement?: string;
 };
 
 // Home Content CPT entry (slug: home) — homepage + footer identity.

@@ -59,6 +59,7 @@ async function withFallback<T>(
 type WPImage = { sourceUrl: string; altText: string };
 
 type WPItemNode = {
+	databaseId?: number | null;
 	slug: string;
 	title: string;
 	excerpt: string;
@@ -68,6 +69,7 @@ type WPItemNode = {
 
 type WPRoomFields = {
 	startingprice?: number | null;
+	units?: number | null;
 	currency?: string | null;
 	capacity?: number | null;
 	adults?: number | null;
@@ -140,6 +142,7 @@ function mapRoom(n: WPItemNode & { roomFields?: WPRoomFields | null }): Room {
 	return {
 		slug: n.slug,
 		name,
+		id: n.databaseId ?? 0,
 		excerpt: clean(n.excerpt) || name,
 		description: clean(n.content),
 		featuredImage: nodeImage(n),
@@ -148,6 +151,7 @@ function mapRoom(n: WPItemNode & { roomFields?: WPRoomFields | null }): Room {
 			name,
 		),
 		startingPrice: f?.startingprice ?? undefined,
+		units: f?.units && f.units > 0 ? f.units : 1,
 		currency: f?.currency || "NPR",
 		capacity: f?.capacity ?? 2,
 		adults: f?.adults ?? 2,
@@ -207,6 +211,8 @@ const SETTINGS_FIELDS = `
 	googleMapsUrl googleMapsEmbed latitude longitude
 	instagram facebook tripadvisor bookingUrl
 	checkIn checkOut currency footerDescription logoUrl
+	mealPlans extraBedPrice pickupPrice taxPercent servicePercent
+	cancellationPolicy paymentTerms childPolicy idRequirement
 `;
 
 export async function getHotelSettings(): Promise<HotelSettings> {
@@ -753,10 +759,10 @@ export async function getContactPage(): Promise<ContactPage | null> {
 }
 
 const ROOM_FIELDS = `
-	slug title excerpt content
+	slug title excerpt content databaseId
 	featuredImage { node { sourceUrl altText } }
 		roomFields {
-			startingprice currency capacity adults children
+			startingprice units currency capacity adults children
 			bedtype roomsize view amenities checkin checkout
 			galleryimage1 { sourceUrl altText }
 			galleryimage2 { sourceUrl altText }

@@ -48,6 +48,15 @@ function sh_defaults() {
             'currency' => 'NPR',
             'footerDescription' => 'A peaceful Himalayan retreat shaped by nature, warm hospitality, and restorative natural hot springs in the heart of Myagdi.',
             'logoUrl' => '',
+            'mealPlans' => '',
+            'extraBedPrice' => '',
+            'pickupPrice' => '',
+            'taxPercent' => '',
+            'servicePercent' => '',
+            'cancellationPolicy' => 'Free cancellation until 48 hours before check-in. Later cancellations are charged one night.',
+            'paymentTerms' => 'Pay at the hotel on arrival. We accept cash (NPR), eSewa, Khalti and bank transfer.',
+            'childPolicy' => 'Children under 5 stay free. Extra beds available on request for older children.',
+            'idRequirement' => 'Please carry a valid ID (citizenship or passport) for check-in.',
     ];
 }
 
@@ -94,7 +103,11 @@ add_action('graphql_register_types', function () {
         'instagram' => $str, 'facebook' => $str, 'tripadvisor' => $str,
         'bookingUrl' => $str, 'checkIn' => $str, 'checkOut' => $str,
         'currency' => $str, 'footerDescription' => $str,
-        'logoUrl' => $str,
+        'logoUrl' => $str, 'mealPlans' => $str,
+        'extraBedPrice' => $str, 'pickupPrice' => $str,
+        'taxPercent' => $str, 'servicePercent' => $str,
+        'cancellationPolicy' => $str, 'paymentTerms' => $str,
+        'childPolicy' => $str, 'idRequirement' => $str,
     ]]);
     register_graphql_field('RootQuery', 'hotelSettings', [
         'type' => 'ShHotelSettings',
@@ -120,6 +133,15 @@ function sh_field_defs() {
         ['checkIn', 'Check-in', 'text'], ['checkOut', 'Check-out', 'text'],
         ['currency', 'Currency', 'text'], ['footerDescription', 'Footer description', 'textarea'],
         ['logoUrl', 'Logo image URL (upload in Media Library, paste file URL — empty = monogram)', 'text'],
+        ['mealPlans', 'Meal plans (one Name | price per person/night per line)', 'textarea'],
+        ['extraBedPrice', 'Extra bed price (per night, same currency)', 'text'],
+        ['pickupPrice', 'Airport pickup price (flat, same currency)', 'text'],
+        ['taxPercent', 'Tax % added at booking', 'text'],
+        ['servicePercent', 'Service charge % added at booking', 'text'],
+        ['cancellationPolicy', 'Cancellation policy (shown at booking + in emails)', 'textarea'],
+        ['paymentTerms', 'Payment terms (shown at booking + in emails)', 'textarea'],
+        ['childPolicy', 'Child policy (shown at booking + in emails)', 'textarea'],
+        ['idRequirement', 'ID requirement (shown at booking + in emails)', 'textarea'],
     ] as [$k, $l, $t]) $F[] = [SH_HOTEL_OPTION, 'hotel', $k, $l, $t];
     // NOTE: page content (hero, story, hot spring, dining, location,
     // final CTA, about) is edited on the Home Content + page CPTs —
@@ -152,7 +174,7 @@ function sh_sanitize_hotel($in) {
     $out = [];
     if (!is_array($in)) return $out;
     $allowed = array_keys(sh_defaults());
-    $textarea_keys = ['googleMapsEmbed', 'footerDescription', 'subtagline'];
+    $textarea_keys = ['googleMapsEmbed', 'footerDescription', 'subtagline', 'mealPlans', 'cancellationPolicy', 'paymentTerms', 'childPolicy', 'idRequirement'];
     $url_keys = ['logoUrl', 'googleMapsUrl', 'instagram', 'facebook', 'tripadvisor', 'bookingUrl'];
     foreach ($in as $k => $v) {
         if (!is_string($k) || !in_array($k, $allowed, true)) continue;
