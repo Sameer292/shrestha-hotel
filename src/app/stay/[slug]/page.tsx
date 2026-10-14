@@ -107,7 +107,7 @@ export default async function RoomPage({
 					</div>
 				</div>
 				<aside className="lg:col-span-4">
-					<div className="bg-white border border-[var(--line)] rounded-[20px] p-6 sticky top-24">
+					<div className="bg-white border border-[var(--line)] rounded-[20px] p-6 sticky top-24 z-10">
 						{room.startingPrice ? (
 							<p className="font-display text-2xl text-[var(--forest)]">
 								{formatPrice(room.startingPrice, room.currency)}{" "}
