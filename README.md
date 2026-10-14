@@ -18,9 +18,9 @@ bun run typecheck            # tsc --noEmit
 ## Env
 
 ```
-NEXT_PUBLIC_SITE_URL=https://www.shresthahotel.com
-WORDPRESS_API_URL=https://cms.shresthahotel.com/graphql
-WORDPRESS_GRAPHQL_URL=https://cms.shresthahotel.com/graphql
+NEXT_PUBLIC_SITE_URL=https://shresthahotelhotspring.com
+WORDPRESS_API_URL=https://shresthahotelhotspring.com/graphql
+WORDPRESS_GRAPHQL_URL=https://shresthahotelhotspring.com/graphql
 REVALIDATE_SECRET=long-random-string
 ```
 
@@ -81,7 +81,7 @@ CPTs to create (exposed to GraphQL):
 
 Global settings: use **ACF Options Page** “Hotel Settings” for hotelName, tagline, logo, phones, email, whatsapp, address, maps URL/embed, lat/lng, socials, bookingUrl, check-in/out, currency, footerDescription. Also create a “Homepage” options group for hero/intro/hotSpring/dining/finalCta — so copy changes don’t require redeploys.
 
-GraphQL endpoint must be `https://cms.shresthahotel.com/graphql`. Configure CORS to allow `www.shresthahotel.com`. Permalinks: Post name. Media: set featured images + alt text.
+GraphQL endpoint must be `https://shresthahotelhotspring.com/graphql`. Configure CORS to allow `shresthahotelhotspring.com`. Permalinks: Post name. Media: set featured images + alt text.
 
 ## Animation
 
@@ -105,7 +105,7 @@ All placeholder images are `picsum.photos` via `src/lib/wordpress/mock.ts:img()`
 ## Deployment
 
 - Frontend on Vercel (or any Next.js host). Set env vars there.
-- WordPress on `cms.shresthahotel.com` (any host with PHP/MySQL).
+- WordPress on `shresthahotelhotspring.com` (any host with PHP/MySQL).
 - Keep WP admin + app passwords private; never expose in client bundle.
 
 ## Content publishing

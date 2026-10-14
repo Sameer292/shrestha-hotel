@@ -87,4 +87,4 @@ docker compose up -d
 
 ## Production
 
-Replace local URL with `https://cms.shresthahotel.com/graphql` in hosting env (Vercel → Environment Variables). Keep `REVALIDATE_SECRET` identical in WP env and Next env. The Docker setup is **dev only** — production WP should be on managed hosting with backups.
+Replace local URL with `https://shresthahotelhotspring.com/graphql` in hosting env (Vercel → Environment Variables). Keep `REVALIDATE_SECRET` identical in WP env and Next env. The Docker setup is **dev only** — production WP should be on managed hosting with backups.
