@@ -20,14 +20,10 @@ const NAV = [
 export default function Header({
 	bookingUrl = "/booking",
 	hotelName = "Shrestha Hotel",
-	phone = "+977 9800000000",
-	email = "namaste@shresthahotelhotspring.com",
 	logoUrl = "",
 }: {
 	bookingUrl?: string;
 	hotelName?: string;
-	phone?: string;
-	email?: string;
 	logoUrl?: string;
 }) {
 	const [scrolled, setScrolled] = useState(false);
@@ -129,11 +125,11 @@ export default function Header({
 			{/* Fullscreen mobile menu */}
 			<div
 				className={cn(
-					"fixed inset-0 z-40 bg-[var(--cream)] transition-transform duration-500 lg:hidden flex flex-col",
+					"fixed inset-0 z-40 bg-[var(--cream)] transition-transform duration-500 lg:hidden flex flex-col h-dvh overflow-y-auto overscroll-contain",
 					open ? "translate-y-0" : "-translate-y-full",
 				)}
 			>
-				<div className="pt-24 pb-8 container-outer flex flex-col gap-1 flex-1">
+				<div className="pt-20 pb-6 container-outer flex flex-col gap-1 flex-1">
 					{NAV.map((l) => (
 						<Link
 							key={l.href}
@@ -150,16 +146,11 @@ export default function Header({
 					<Link
 						href={bookingUrl}
 						onClick={() => setOpen(false)}
-						className="mt-6 bg-[var(--forest)] text-white rounded-full py-4 text-center text-sm tracking-wide font-medium"
-					>
-						Book Your Stay
-					</Link>
-					<p className="text-xs text-[var(--muted)] mt-4 leading-relaxed">
-						Beni, Myagdi • {phone}
-						<br />
-						{email}
-					</p>
-				</div>
+					className="mt-6 bg-[var(--forest)] text-white rounded-full py-4 text-center text-sm tracking-wide font-medium sticky bottom-6"
+				>
+					Book Your Stay
+				</Link>
+			</div>
 			</div>
 		</>
 	);

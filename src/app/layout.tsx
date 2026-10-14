@@ -63,8 +63,6 @@ export default async function RootLayout({
 					<Header
 						bookingUrl={s.bookingUrl}
 						hotelName={s.hotelName}
-						phone={s.phone}
-						email={s.email}
 						logoUrl={s.logoUrl}
 					/>
 					<main className="flex-1">{children}</main>
