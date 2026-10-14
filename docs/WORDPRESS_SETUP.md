@@ -1,10 +1,10 @@
 # WordPress as Headless CMS — Setup Guide
 
-WordPress lives at `https://cms.shresthahotel.com` and is **never** used to render the public site. Next.js at `www.shresthahotel.com` fetches over GraphQL.
+WordPress lives at `https://shresthahotelhotspring.com` and is **never** used to render the public site. Next.js at `shresthahotelhotspring.com` fetches over GraphQL.
 
 ## 1. Install WordPress
 
-- Fresh WP on `cms.shresthahotel.com` (PHP 8.2+, MySQL/MariaDB).
+- Fresh WP on `shresthahotelhotspring.com` (PHP 8.2+, MySQL/MariaDB).
 - Create admin + editor accounts (editors manage content, not code).
 - Settings → Permalinks → **Post name**.
 
@@ -126,10 +126,10 @@ All GraphQL queries in `src/lib/wordpress/queries.ts` read these — extend ther
 
 ## 6. GraphQL
 
-Endpoint: `https://cms.shresthahotel.com/graphql`
+Endpoint: `https://shresthahotelhotspring.com/graphql`
 
 - Test with GraphiQL (ships with WPGraphQL) or https://studio.apollographql.com.
-- CORS: allow `https://www.shresthahotel.com` (and `http://localhost:3000` in dev). In WP, filter `graphql_response_headers` or via hosting.
+- CORS: allow `https://shresthahotelhotspring.com` (and `http://localhost:3000` in dev). In WP, filter `graphql_response_headers` or via hosting.
 
 ## 7. Media
 

@@ -7,11 +7,11 @@ Prod shape: one domain, WordPress in the docroot, Docker runs **only Next.js**.
 nginx sends just the `/wp-*` paths to PHP; everything else goes to Node:
 
 ```
-visitor ──https──▶ Hestia nginx (www.shresthahotel.com)
+visitor ──https──▶ Hestia nginx (shresthahotelhotspring.com)
                       ├── /wp-admin, /graphql, /wp-content, /wp-includes,
                       │    /wp-json, /wp-login.php, /wp-cron.php ──▶ Apache/PHP
                       └── everything else ──▶ 127.0.0.1:3000 (Docker: app)
-app ──server-side fetch──▶ https://www.shresthahotel.com/graphql
+app ──server-side fetch──▶ https://shresthahotelhotspring.com/graphql
 WP save ──revalidate ping──▶ http://127.0.0.1:3000/api/revalidate
 ```
 
@@ -19,7 +19,7 @@ Rule: never add app routes under `/wp-*`. `xmlrpc.php` is blocked outright.
 
 ## 1. Panel setup (Hestia UI)
 
-1. One **Web Domain**: `www.shresthahotel.com` (default templates for now).
+1. One **Web Domain**: `shresthahotelhotspring.com` (default templates for now).
 2. Enable **SSL + Let's Encrypt + Force HTTPS** on it.
 3. **DB**: Add Database (MySQL) for WP. Save credentials.
 
@@ -29,8 +29,8 @@ Rule: never add app routes under `/wp-*`. `xmlrpc.php` is blocked outright.
    the panel DB). Nothing else lives there — Node serves the site, not files.
 2. `wp-config.php`, above `/* That's all, stop editing */`:
    ```php
-   define('WP_HOME', 'https://www.shresthahotel.com');
-   define('WP_SITEURL', 'https://www.shresthahotel.com');
+   define('WP_HOME', 'https://shresthahotelhotspring.com');
+   define('WP_SITEURL', 'https://shresthahotelhotspring.com');
    define('NEXT_APP_URL', 'http://127.0.0.1:3000');
    define('REVALIDATE_SECRET', '<same-value-as-app-env>');
    ```
@@ -55,7 +55,7 @@ Rule: never add app routes under `/wp-*`. `xmlrpc.php` is blocked outright.
 ```bash
 sudo cp deploy/hestia/nextjs.tpl deploy/hestia/nextjs.stpl \
   /usr/local/hestia/data/templates/web/nginx/
-# panel: Web > Edit www.shresthahotel.com > Proxy Template = nextjs > Save
+# panel: Web > Edit shresthahotelhotspring.com > Proxy Template = nextjs > Save
 # verify: sudo nginx -t && sudo systemctl reload nginx
 ```
 

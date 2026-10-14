@@ -3,7 +3,7 @@ import { getExperiences, getRooms } from "@/lib/wordpress/queries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const site =
-		process.env.NEXT_PUBLIC_SITE_URL || "https://www.shresthahotel.com";
+		process.env.NEXT_PUBLIC_SITE_URL || "https://shresthahotelhotspring.com";
 	const rooms = await getRooms().catch(() => []);
 	const ex = await getExperiences().catch(() => []);
 	const staticRoutes = [

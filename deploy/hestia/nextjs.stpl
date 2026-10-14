@@ -1,4 +1,4 @@
-# Hestia proxy template (TLS): shresthahotel.hashtagweb.com.np -> Next.js in Docker (127.0.0.1:3200)
+# Hestia proxy template (TLS): shresthahotelhotspring.com -> Next.js in Docker (127.0.0.1:3200)
 server {
 	listen      %ip%:%proxy_ssl_port% ssl;
 	server_name %domain_idn% %alias_idn%;
