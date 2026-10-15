@@ -26,3 +26,37 @@ done
 
 echo "✓ live: https://shresthahotelhotspring.com (via Hestia nginx → 127.0.0.1:3200)"
 $COMPOSE ps
+
+echo "==> Revalidating pages (drop build-time fallback content)..."
+# Pages are baked during `docker build`, when WordPress may be unreachable,
+# so fresh deploys can briefly serve placeholder content. Revalidate every
+# static route (mirrors sitemap.ts) so the first visitor gets live WP data.
+# Non-fatal: time-based ISR still refreshes pages even if this step fails.
+set -a
+# shellcheck disable=SC1091
+. ./.env.prod
+set +a
+SITE_URL="${SITE_URL:-https://shresthahotelhotspring.com}"
+revalidate() { # $1 = path, empty = default set (/ + /stay + /experiences)
+	if [ -z "${1:-}" ]; then
+		curl -sf -X POST "$SITE_URL/api/revalidate" \
+			-H "x-revalidate-secret: $REVALIDATE_SECRET" \
+			-H "Content-Type: application/json" \
+			-d '{}' >/dev/null
+	else
+		curl -sf -X POST "$SITE_URL/api/revalidate" \
+			-H "x-revalidate-secret: $REVALIDATE_SECRET" \
+			-H "Content-Type: application/json" \
+			-d "{\"path\":\"$1\"}" >/dev/null
+	fi
+}
+if ! revalidate ""; then
+	echo "⚠ revalidate failed for default paths (ISR will refresh them shortly)"
+fi
+for p in /hot-spring /events /wellness /gallery /about /contact /booking; do
+	if revalidate "$p"; then
+		echo "  ✓ $p"
+	else
+		echo "  ⚠ $p not revalidated (ISR will refresh it shortly)"
+	fi
+done
